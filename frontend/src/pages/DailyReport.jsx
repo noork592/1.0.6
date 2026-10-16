@@ -50,7 +50,8 @@ const isLudhianaLocation = (...parts) => {
 };
 
 export default function DailyReport() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, canAct } = useAuth();
+  const canEditLedger = canAct("edit:customerLedger");
   const [date, setDate] = useState(todayYmd());
   // Single day vs multi-day range. In range mode the report covers
   // [date .. endDate] inclusive (IST days).
@@ -831,8 +832,8 @@ body { padding: 12mm; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI"
                                   type="number" min="0" step="0.01"
                                   value={tvVal}
                                   placeholder="Enter bill amount"
-                                  disabled={!canEdit}
-                                  title={canEdit ? "" : lockMsg}
+                                  disabled={!canEdit || !canEditLedger}
+                                  title={!canEditLedger ? "Needs \"Edit customer ledger\" access" : (canEdit ? "" : lockMsg)}
                                   onChange={(e) => updEdit("dispatch", dsp.id, { total_value: e.target.value })}
                                   onFocus={(e) => { if (parseFloat(tvVal || "0") === 0) updEdit("dispatch", dsp.id, { total_value: "" }); e.target.select(); }}
                                   onBlur={() => { if (tvVal === "" || tvVal === "-") updEdit("dispatch", dsp.id, { total_value: "0" }); }}
@@ -854,8 +855,8 @@ body { padding: 12mm; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI"
                                 size="sm"
                                 variant="outline"
                                 onClick={() => setEditingDispatch({ ...dsp, _customerCity: g.city || "", _customerLocation: g.location || "", _customerAddress: g.address || "" })}
-                                disabled={!canEdit}
-                                title={canEdit ? "Edit items, GR & bill" : lockMsg}
+                                disabled={!canEdit || !canEditLedger}
+                                title={!canEditLedger ? "Needs \"Edit customer ledger\" access" : (canEdit ? "Edit items, GR & bill" : lockMsg)}
                                 data-testid={`report-dispatch-edit-btn-${dsp.id}`}
                                 className="rounded-sm h-9 w-full border-slate-300 disabled:opacity-40"
                               >

@@ -3358,9 +3358,11 @@ async def admin_dispatch_ledger(
 
 
 @api_router.patch("/dispatches/{did}/gr")
-async def update_dispatch_gr(did: str, body: DispatchGrUpdate, user=Depends(require_action("edit:dispatch"))):
+async def update_dispatch_gr(did: str, body: DispatchGrUpdate, user=Depends(get_current_user)):
     """Set / update the GR (Goods Receipt) number for a dispatch.
     Any authenticated user can edit this field (per product spec)."""
+    if not (has_action_permission(user, "edit:dispatch") or has_action_permission(user, "edit:customerLedger")):
+        raise HTTPException(status_code=403, detail="You don't have permission to edit or delete here. Ask an admin to grant access.")
     gr = (body.gr_number or "").strip()
     res = await db.dispatches.update_one(
         {"id": did},
@@ -3413,8 +3415,11 @@ class DispatchEdit(BaseModel):
     dispatched_at: Optional[str] = None
 
 
+_LEDGER_DISPATCH_FIELDS = ("total_value", "items", "customer_id", "dispatched_at")
+
+
 @api_router.patch("/dispatches/{did}")
-async def update_dispatch(did: str, body: DispatchEdit, user=Depends(require_action("edit:dispatch"))):
+async def update_dispatch(did: str, body: DispatchEdit, user=Depends(get_current_user)):
     """Edit a dispatch's bookkeeping fields (GR, transport, notes, bill
     amount, bag count) and optionally its line items (name / qty / price).
 
@@ -3433,6 +3438,13 @@ async def update_dispatch(did: str, body: DispatchEdit, user=Depends(require_act
     (admin-configurable in /api/settings, default 3 days) of when it was
     punched. Admins can edit at any time.
     """
+    # Amount / items / party / date change the customer ledger → need "Edit customer ledger".
+    # Report-only fields (GR, transport, notes, bags, bill no.) also allow "Edit dispatch report".
+    touches_ledger = any(getattr(body, f) is not None for f in _LEDGER_DISPATCH_FIELDS)
+    allowed = has_action_permission(user, "edit:customerLedger") or (
+        not touches_ledger and has_action_permission(user, "edit:dispatch"))
+    if not allowed:
+        raise HTTPException(status_code=403, detail="You don't have permission to edit or delete here. Ask an admin to grant access.")
     existing = await db.dispatches.find_one({"id": did}, {"_id": 0})
     if not existing:
         raise HTTPException(status_code=404, detail="Dispatch not found")
@@ -3615,7 +3627,7 @@ async def update_dispatch(did: str, body: DispatchEdit, user=Depends(require_act
 
 
 @api_router.delete("/dispatches/{did}")
-async def delete_dispatch(did: str, admin=Depends(require_action("delete:dispatch"))):
+async def delete_dispatch(did: str, admin=Depends(require_action("delete:customerLedger"))):
     """Delete a dispatch record (admin only) and rebalance the customer's
     parent order(s) + raw-material stock so the system stays consistent.
 

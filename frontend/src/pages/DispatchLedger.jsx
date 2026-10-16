@@ -773,6 +773,7 @@ export default function DispatchLedger() {
         </div>
         {partyApplied && (
           <div className="flex items-center gap-2 flex-wrap">
+            {canAct("add:customerLedger") && <>
             <Button onClick={openPaymentDialog} data-testid="ledger-record-payment-btn"
                     className="bg-emerald-700 hover:bg-emerald-800 text-white rounded-sm h-10">
               <Wallet className="w-4 h-4 mr-1.5" /> {t("ledger.recordPayment")}
@@ -781,6 +782,7 @@ export default function DispatchLedger() {
                     className="bg-amber-600 hover:bg-amber-700 text-white rounded-sm h-10">
               <Undo2 className="w-4 h-4 mr-1.5" /> Sale Return
             </Button>
+            </>}
             <Button onClick={load} variant="outline" size="sm" data-testid="ledger-refresh"
                     className="rounded-sm border-slate-300 h-10">
               <RefreshCw className="w-4 h-4 mr-1" /> {t("ledger.refresh")}
@@ -1338,7 +1340,7 @@ export default function DispatchLedger() {
           <div className="grid grid-cols-2 gap-3 pt-2">
             {(() => {
               const mod = actionRow
-                ? (actionRow.kind === "dispatch" ? "dispatch" : "customerLedger")
+                ? "customerLedger"
                 : null;
               const canEditRow = mod ? canAct(`edit:${mod}`) : false;
               const canDeleteRow = mod ? canAct(`delete:${mod}`) : false;
