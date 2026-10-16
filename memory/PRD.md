@@ -1,0 +1,64 @@
+# Factory Order Management ERP — PRD
+
+## Original Problem Statement
+Full-stack Factory Order Management ERP (React + FastAPI + MongoDB): user roles, order tracking, dispatch management, customer ledgers, reporting. The user iterates by providing updated GitHub repos and asking for FULL codebase replacements (current source of truth: https://github.com/noork592/39.git).
+
+## Architecture
+- Frontend: React (`/app/frontend`), Tailwind, shadcn/ui, react-router-dom, craco, PWA (service worker), i18n (en/hi)
+- Backend: FastAPI (`/app/backend/server.py`, ~8400 lines), Motor/MongoDB, JWT auth, bcrypt
+- Auth: `POST /api/auth/login` (email OR username in `email` field), `POST /api/auth/verify-otp`, OTP optional per-user (`otp_login`, default OFF in repo 39)
+- Health: `GET /health` (root, used by platform probe). NOTE: `/api/health` is defined AFTER `app.include_router(api_router)` in repo 39's server.py so it 404s — repo bug, harmless.
+- Env: `/app/backend/.env` (MONGO_URL, DB_NAME, JWT_*, EMERGENT_LLM_KEY, GMAIL_*) and `/app/frontend/.env` (REACT_APP_BACKEND_URL) are LOCAL ONLY — repo has no .env files (gitignored). Never delete them during rsync --delete (exclude '.env').
+
+## Repo Sync Procedure (user's recurring request)
+1. `git clone --depth 1 <repo> /tmp/repoN`
+2. `rsync -av --delete --exclude='.env' --exclude='__pycache__' /tmp/repoN/backend/ /app/backend/`
+3. `rsync -av --delete --exclude='.env' --exclude='node_modules' /tmp/repoN/frontend/ /app/frontend/`
+4. Copy root extras (README, backend_test.py, tests/, test_reports/) — never touch /app/.git, /app/.emergent
+5. `yarn install` (frontend), `pip install -r requirements.txt` if changed
+6. `sudo supervisorctl restart all`, smoke check `/health` + login page
+
+## Implemented (history)
+- Sequential repo syncs: 6-AUG → 24aug → 25aug → 28f → 29f → 30 → 32 → 34 → 36 → 38 → 39 → 41 → **44 (current, 2026-10-02)**
+- Repo 44 added frontend deps `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities` (drag-and-drop). `.env` has no repo copy, preserved as-is.
+- Repo 39 highlights: Facebook-style login page (by design), Estimates, PurchaseCenter, Suppliers/Vendor ledgers, TransportRoutes, AI chatbot, price lists, login attestation flow
+- Past custom work (may or may not survive repo replacements): OTP toggle, JK1 blank-view user, order/dispatch edit fixes, pvt-marka/bill-number exclusivity, leaflet maps (repo 38)
+
+## Known Issues / Pending
+- RESOLVED (2026-09-26): admin password reset to `admin123` — later REVERTED by the user themselves via Settings → Backup & Restore (5 restore calls in backend log). Current admin password = whatever is in the user's restored backup (user logs in fine with OTP). Do NOT reset again unless asked.
+- RESOLVED (2026-09-27): OTP emails were never sent — Gmail rejected the saved app password (535 BadCredentials). Admin account email changed admin@factory.com → ganpatifillingstn@gmail.com; NEW Gmail app password set in `/app/backend/.env` (GMAIL_APP_PASSWORD) + DB `app_backup_settings.gmail_app_password`. SMTP verified, test email delivered. OTP recipient = backup settings `send_to` (already ganpatifillingstn@gmail.com), NOT the account email.
+- CAUTION: a backup restore of `app_backup_settings` would revert the Gmail password — if OTP stops arriving after a restore, re-check that collection.
+- DONE (2026-09-26): agentic edit — TransportRoutes "Route summary + save" block moved below the map (was inside Select-transports panel). Compiled clean; visual check not possible (no valid creds after user's restore).
+- "Customer not found" when typing bill number in Daily Report pvt-marka field (reported pre-repo-38; recheck in repo 39 if user reports again)
+- `/api/health` 404 (route ordering bug in user's repo; root `/health` fine)
+- NOTE: TransportRoutes is not a route in App.js — it's embedded as a tab inside DailyReport (`/reports/daily`, tab value "transport")
+
+## Next Action Items
+- Test repo 39 flows when user requests (user declined testing for the sync)
+- Optional: brand the Facebook-style login page with JK Products identity
+- Optional: fix `/api/health` route ordering (one line move)
+
+## Feature Log
+- 2026-09-26: "Avoid railway crossing" route option added to TransportRoutes (Daily Report → Transport tab).
+  - Backend `/api/transport/optimize` (server.py ~8010+): new helpers `_decode_polyline`, `_encode_polyline`, `_hav_km`, `_pt_seg_km`, `_crossings_on`, `_fetch_railway_features` (Overpass, 3-mirror fallback + 1hr cache), `_osrm_geojson`, `_nearby_bridges`, `_build_avoidance_route`.
+  - Every route option now carries a `crossings` count (railway level crossings within 30m of its geometry). New option "Avoid railway crossing" reroutes each leg via nearby road bridges/flyovers (OSM `bridge=yes`+highway) to minimise phatak crossings. Best-effort: depends on OSM data + Overpass availability; falls back gracefully (skips option) if Overpass unreachable.
+  - Frontend TransportRoutes.jsx: option buttons show a TrainFront icon + phatak count (green if 0, amber if >0). testid `tr-route-option-crossings-{i}`.
+  - Verified end-to-end via preview (token-injected, admin password unknown after user's backup restore): 4 buttons render with counts; helper unit tests pass.
+- 2026-09-26 (fix): "Avoid railway crossing" was not actually avoiding. Root causes fixed in server.py: (1) candidates were bridge way CENTERS (culverts/nullahs) — now only bridges whose geometry crosses the rail line, via the exact rail-crossing APEX point; (2) candidate cap too small — now 6 within 1.5km with 50m carriageway dedupe, alt_budget 24; (3) flyover false positives — phatak not counted when the route's nearest point is on a flyover spanning that spot. Verified: test leg went 2.74km/2 phataks → 5.53km/1 phatak (detour via flyover), confirmed on map UI.
+- 2026-09-27 (fix): Avoid option now has its OWN stop order — `_order_along_route` projects stops onto the avoid geometry (first-within-150m rule) and rebuilds legs in real driving order, so stop #1 = transport the flyover route reaches first (previously copied Shortest's order). Deterministic test: nominal [North,SW] → avoid [SW,North] with geometry match. Overpass mirrors expanded to 6 with 12s/request cap (was causing 2min+ stalls + silent option skips under rate limits).
+- 2026-09-27 (feature): User-marked phataks + OSM-independent avoidance. Backend: `GET/POST/DELETE /api/rail-crossings` (db.rail_crossings), merged into optimize's crossing list; OSM map API fallback (`_osm_map_api_fallback`, tiled per-phatak via `_rail_data_near`) when Overpass is down/empty; detour candidates now include flyover apexes + rail-parallel points (`_rail_side_points`) + perpendicular offsets (`_offset_via_points`). Verified WITHOUT Overpass: 2.74km/1 phatak → 7.44km/0 phatak via flyover. Frontend: "Mark phatak" toggle in map header (testid tr-phatak-mode), red ✕ markers, click marker to delete. Two real factory-area phataks pre-marked (30.90191,75.85429 / 30.89965,75.85309).
+
+- 2026-10-14: Cloned repo 43 (anhad592/43). Gmail OTP/backup enabled: GMAIL_USER/GMAIL_APP_PASSWORD/BACKUP_EMAIL_TO in backend/.env + db.app_backup_settings (send_to=ganpatifillingstn@gmail.com). SMTP login + test OTP email verified. Admin otp_login=true. User restored own backup — admin password is from their backup (not admin123).
+- 2026-10-14 (bug fix): Orders stuck "Pending" though dispatched (e.g. RUNECHA 29/9 order vs slip #938). Root cause: pending qty only reduced at slip-punch FIFO; late-entered back-dated orders, slip party reassignment, and restore-to-wrong-order bug never reconciled. Added `_reconcile_customer_orders` (server.py) + `POST /api/orders/reconcile?dry_run=` (admin); auto-runs after order create/edit, off-order dispatch, dispatch edit. Dispatches now carry `order_alloc {order_id:{item_id:qty}}`. Fixed `_restore_dispatch_qty_to_orders` target selection and slip reassignment rebalancing. One-time data fix applied: 34 orders, 10,412 pcs, 5 fully cleared. Pre-fix backups: /app/backups/*_before_reconcile.json, change list: /app/backups/reconcile_changes.json. Tests: /app/backend/tests/test_reconcile_orders.py (9/9 pass).
+- 2026-10-14 (feature): Admin Settings → "Resync pending orders" card (components/ResyncOrders.jsx): Check (dry-run) shows pending count / orders needing fix / pcs + per-order slip detail; Apply button with confirm. Orders page SlipHistory (components/SlipHistory.jsx): progress bar "X / Y pcs completed · Z pending" + per-slip rows (Pending & Dispatched tabs; progress only on All). Backend list_orders now returns completed_pcs, pending_pcs, dispatch_summary[].pcs, and uses dispatch.order_alloc so shared slips show only the qty that went to that order. i18n en/hi keys resync.*, orders.progress, orders.slipCompleted. Tests: backend/tests/test_slip_history_and_resync.py.
+- 2026-10-14: Resync card also shown at top of Orders page (admins only); list auto-refreshes after Apply.
+- 2026-10-14: Removed progress bar from All Orders / Discrepancy view (kept on Pending & Dispatched tabs).
+- 2026-10-14 (feature): Slip Click Preview — slip numbers on Orders page (SlipHistory rows + All-tab brief) open full printable slip dialog in place. Slip dialog extracted to components/SlipPreviewDialog.jsx (shared with DispatchLedger). by-slip API now returns customer.bill_number_mode/email.
+- 2026-10-14 (feature): Undo for timing-discrepancy resolutions (clear/update_date/keep/delete). Snapshot in db.discrepancy_undo (order_before + dispatch_before); POST /api/orders/{id}/undo-discrepancy restores; list_orders returns discrepancy_undo; UI: toast Undo action + persistent amber undo bar (disc-undo-bar-{id}).
+- 2026-10-15: Estimates — per-row Price is editable (price_override per line; empty = price-list rate; "list ₹X" reset link); backend returns list_net_unit_price + price_override. Rate ₹ and Disc. columns removed from the estimate slip/PDF. Order Activity History: db.order_activity, GET /api/orders/{id}/activity, logged on create/merge/edit/status/delete, slip link (FIFO/execute/edit/auto-resync), qty restore (slip edit/delete/reassign), discrepancy resolve/undo; backfilled 1243 entries (note=backfill) from created_at + linked slips. UI: History icon on each order → OrderActivityDialog timeline (slip no. opens slip preview). execute path now also writes order_alloc.
+- 2026-10-15 (feature): Estimate → Order. POST /api/estimates/{id}/convert-to-order creates Pending order (items carry rate = estimate net price, notes 'From Estimate #N', estimate_id/no), blocks double convert (409). Order item 'rate' is used as net_unit_price (price_override) on dispatch slips (execute + off-order FIFO via _apply_order_rates); preserved on admin order edit. UI: 'Convert to Order' on estimate view + 'To Order'/'Order ✓' in Records; Orders chips show @₹rate; Orders page accepts location.state.highlightId. Self-tested via API (testing agent skipped per user request).
+- 2026-10-15 (feature): Discrepancy Resync — POST /api/orders/discrepancy-resync?dry_run= (admin). For each flagged order: if earlier slip qty still free → apply via _reconcile_customer_orders(allow_before={order:slip}) = 'clear'; else 'keep' (false alarm, dismiss). Each result gets discrepancy_undo snapshot + activity log (note=resync) so per-order Undo works. UI: components/DiscrepancyResync.jsx shown on Orders page when Discrepancy filter selected (replaces pending-resync card there). Dry run on live data: 25 flagged → 6 clear, 19 keep. Self-tested apply+undo with QA data (cleaned up).
+- 2026-10-15: Discrepancy resync deep-scan: also finds MISSED discrepancies (slips before order entry, older than warning window up to window+10/30 days, not linked, with free qty) — shown with 'Missed' badge; per-row checkboxes + select all; body {order_ids} restricts apply; undo supports multiple slips (dispatches_before). Live dry run: 29 total, 4 missed, 10 clear, 19 keep.
+- 2026-10-15: Discrepancy resync now strictly uses Settings discrepancy_window_days (no 30-day deep scan); flagged orders consider ALL slips within window. Live: 25 total, 0 missed, 9 clear (4939 pcs), 16 keep.
+- 2026-10-15: Pending resync card: row checkboxes + select all + Cancel; POST /api/orders/reconcile accepts body {order_ids} (only those applied; unselected keep qty reserved like preview).
+- 2026-10-15 (bug fix): Discrepancy warning showed only the latest slip before entry (NIKAVI #723 hidden behind #766). Now discrepancy.slips lists ALL slips within Settings window with per-slip 'usable' qty (dry-run reconcile), usable_pcs, pending_after; UI DiscrepancySlips.jsx. 'Clear' is now qty-aware via _reconcile_customer_orders(allow_before, only) and applies all slips; undo restores dispatches_before. Discrepancy resync uses all slips. Live: 39 flagged (window 30d), 20 clearable (8339 pcs), 14 had hidden slips. Tested iteration_5 100%.

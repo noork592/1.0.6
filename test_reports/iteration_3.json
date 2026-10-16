@@ -1,0 +1,23 @@
+{
+  "summary": "Validated the new 'Slip Click Preview' feature end-to-end. On /orders with Dispatched filter + search 'RUNECHA', the SlipHistory link data-testid=slip-history-link-f0304185-5cf5-4fe3-8930-49b4df74e3bf-0 ('Slip #938') opens data-testid=slip-preview-dialog. Dialog content verified to contain: Slip # 938, Date 02/10/2026, GR No 45-05885, Party RUNECHA AUTOMOBILES, transport DELHI HUBLI, both items (SIDE STAND SPLENDOR (A), SIDE STAND BAJAJ BOXER), Grand Total 800 pcs, Private mark='RA' (slip-private-mark), No. of bags=4 (slip-bag-count). Footer renders slip-print-btn + two share buttons (slip-share-email-open-btn, slip-share-whatsapp-open-btn) — share buttons were NOT clicked. slip-close-btn closes the dialog; user stays on /orders with filter still 'Dispatched'. All-status filter: order-brief-slip-link-{orderId}-0 opens the same dialog. Ledger regression (/dispatch-ledger): ledger-slip-search-input='938' + ledger-slip-search-btn opens the identical SlipPreviewDialog with all expected content and party RUNECHA AUTOMOBILES. Backend: GET /api/dispatches/by-slip/938 .customer now includes bill_number_mode=false and email='' as required.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_reconcile_orders.py",
+    "/app/backend/tests/test_slip_history_and_resync.py"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "SlipPreviewDialog.jsx recomputes bill/line/gst/grand/cash totals TWICE (once inside the table tfoot, once again inside the Bill/Cash box and once more inside the share payload). Extract into a single useMemo-derived object to prevent future drift between the on-screen numbers and the shared payload.",
+    "Orders.jsx openSlip() hard-codes the kind='dispatch' row shape used by SlipPreviewDialog but the component itself ignores row.kind — safe for now, dead field, consider removing to avoid confusing future readers.",
+    "The Pending filter path renders <SlipHistory onOpenSlip={openSlip}/> only when the order has slips; this is correct, but no visible tooltip tells partial-dispatch users that they can click the slip to preview it. Consider a one-line hint on first visit."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "qa_tester / QaTest#2026 (recreated temporarily for this run via direct Mongo insert into db.users with password hashed by passlib bcrypt; cleaned up at end of run — currently deleted again).",
+  "seed_data_creation": "None. Read-only test as instructed.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "qa_tester admin user is NOT persisted — it was deleted at the end of this run. To recreate, insert into db.users: {username:'qa_tester', email:'qa_tester@test.local', is_admin:true, role:'admin', otp_enabled:false, password: bcrypt_hash('QaTest#2026')} using the backend's hash_password helper (field name is 'password', NOT 'password_hash'). The Ledger route is '/dispatch-ledger' (not '/ledger') — the review request's hint was approximate. slip-share buttons are 'slip-share-email-open-btn' and 'slip-share-whatsapp-open-btn' (NOT clicked per instructions — they only OPEN forms, do not auto-send). SlipPreviewDialog is now the single source of truth: /app/frontend/src/components/SlipPreviewDialog.jsx is consumed by Orders.jsx, DispatchLedger.jsx (slip search + row click).",
+  "rca of the issue": "n/a — feature validation. Feature works exactly as specified."
+}

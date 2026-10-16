@@ -1,0 +1,27 @@
+{
+  "summary": "Validated the two new features: (1) Admin Settings → Resync pending orders card and (2) Orders page SlipHistory with per-slip allocation. Backend regression (9 tests in test_reconcile_orders.py) re-run cleanly: 9/9 PASSED. New backend suite /app/backend/tests/test_slip_history_and_resync.py (4 tests) PASSED: completed_pcs/pending_pcs are present on every order with int types; every dispatch_summary group has pcs; RUNECHA order f0304185 is Dispatched with completed_pcs=200, pending_pcs=0, exactly one slip group (#938, 200 pcs, no Splendor leak — order_alloc attribution working); partial 30-of-100 case produces completed_pcs=30 / pending_pcs=70 / slip pcs=30; POST /api/orders/reconcile?dry_run=true returns full schema (dry_run, count, changes, total_pcs, fully_cleared, pending_orders, checked_at). UI validation with qa_tester login: /admin/settings shows resync-card; Check pending orders → resync-stat-pending='332', resync-stat-count='0', resync-stat-pcs='0', resync-all-good visible ('All pending orders match their slips — nothing to fix'), 0 resync rows → apply button correctly NOT shown (per guardrail, resync-apply-btn was never clicked). /orders page: Pending filter rendered 332 slip-progress + 547 slip-history-row elements; Dispatched filter visibly rendered 'Slip #938 · 10/2/2026 · 200 pcs completed (SIDE STAND BAJAJ BOXER, KB-4S, CT-100: 200)' and '200 / 200 pcs completed · 0 pending' progress text for RUNECHA f0304185; All filter rendered 456 slip-progress elements and 0 slip-history-row elements (progress-only mode confirmed). No QA data left behind (session fixture auto-cleaned; 0 QA customers remain).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_reconcile_orders.py",
+    "/app/backend/tests/test_slip_history_and_resync.py",
+    "/app/test_reports/pytest/reconcile_regression.xml",
+    "/app/test_reports/pytest/slip_history_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py is still ~9584 lines; split into routers in a future refactor (same as iteration_1).",
+    "SlipHistory.jsx line 11 falls back to summing items when completed_pcs is undefined — safe for the current backend but creates a subtle divergence if a future endpoint returns dispatch_summary without the pcs field. Consider making completed_pcs/pending_pcs required in the serializer.",
+    "ResyncOrders.jsx uses window.confirm which cannot be styled or auto-dismissed in tests; fine for an admin-only destructive action but worth replacing with a shadcn AlertDialog for consistency with the rest of the app."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_slip_history_and_resync.py (new)"
+  ],
+  "success_rate": {"backend": "100% (13/13 across both suites)", "frontend": "100%"},
+  "test_credentials": "qa_tester / QaTest#2026 (admin, OTP off)",
+  "seed_data_creation": "One QA TEST customer + 1 off-order slip + 1 back-dated order created during the partial-case test; all auto-cleaned by pytest session fixture.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Both /app/backend/tests/test_reconcile_orders.py (9 cases) and /app/backend/tests/test_slip_history_and_resync.py (4 cases) are safe regression suites and self-clean. Live resync endpoint reports count=0 (idempotent on real data). RUNECHA f0304185 remains the canonical real-data assertion anchor for completed_pcs/pending_pcs/order_alloc behaviour. Apply-button (resync-apply-btn) was intentionally NOT exercised in UI because the real dataset has 0 pending drift and the review request forbids applying when non-QA rows could be present.",
+  "rca of the issue": "n/a — feature validation, not a bug fix. Both features behave exactly as specified in the review request."
+}

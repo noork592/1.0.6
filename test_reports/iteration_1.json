@@ -1,0 +1,24 @@
+{
+  "summary": "Validated the pending-order reconciliation fix end-to-end. Wrote 9 pytest cases covering all 8 scenarios in the review request (read-only check on real RUNECHA order, late-entry core bug, partial consumption, order-after-slip must-not-consume, normal FIFO + idempotent reconcile, slip reassignment A->B, reverse reassignment restoring A, delete-slip restores order). All 9 tests PASSED against the live preview backend. UI spot-check as qa_tester confirmed order #f0304185 (RUNECHA AUTOMOBILES, 9/29/2026) now shows status 'Dispatched · 10/2/2026 · Slip #938 — Fully dispatched'. POST /api/orders/reconcile?dry_run=true returned count=0 (idempotent, no further drift). All QA TEST customers/orders/dispatches created during tests were cleaned up (verified 0 remaining).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_reconcile_orders.py",
+    "/app/test_reports/pytest/reconcile_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py is ~9555 lines — well above the 700-line guideline. Recommend splitting into routers (orders.py, dispatch.py, customers.py, reconcile.py, auth.py) in a future refactor; not blocking for this fix.",
+    "_reconcile_customer_orders uses day-level string comparison (slip day >= order day). This is correct for the business case but assumes dispatched_at and order_date are stored as ISO strings with sortable YYYY-MM-DD prefixes; keep this invariant documented."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_reconcile_orders.py (new)"
+  ],
+  "success_rate": {"backend": "100% (9/9)", "frontend": "100% (spot check)"},
+  "test_credentials": "qa_tester / QaTest#2026 (admin, OTP off) — login via POST /api/auth/login {email, password}",
+  "seed_data_creation": "All QA TEST customers/orders/dispatches auto-cleaned by pytest fixture; verified 0 QA TEST customers remain on server.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Reconcile logic is validated end-to-end. The regression suite at /app/backend/tests/test_reconcile_orders.py can be re-run safely (self-cleans). The sibling RUNECHA order #159cdf3d dated 9/30/2026 is intentionally still Pending (slip #948 dated 10/3 arrived BEFORE this order was entered on 10/4 — UI correctly surfaces a 'Possible timing discrepancy' card with Clear/Update/Delete actions); that is user-driven resolution, not a reconciliation bug.",
+  "rca of the issue": "Pre-fix behaviour: Pending orders were only decremented at slip-punch time via FIFO on same-day/future slips. If an order was entered AFTER its slip was already punched (back-dated order_date, as the user does when transcribing paper orders), or a slip was reassigned to a different party, or an edit/restore pathway credited the wrong order, nothing walked back and matched the orphan slip qty to the Pending order. Fix: _reconcile_customer_orders() in /app/backend/server.py (~L5650) now re-walks each customer's pending orders oldest-first and, for every slip dated on/after the order date with matching item_ids and unattributed quantity (quantity minus known order_alloc or heuristic prior-dispatch coverage), applies the free qty to the pending order and persists an explicit dispatch.order_alloc[order_id][item_id]=qty so the attribution is frozen and future runs are idempotent. Hooks were added after POST /api/orders, PATCH /api/orders/{id}, POST /api/dispatch/off-order, PATCH /api/dispatches/{id}, plus admin POST /api/orders/reconcile. Verification: real RUNECHA order f0304185 is Dispatched with items=[]; reconcile dry_run reports count=0 (idempotent)."
+}

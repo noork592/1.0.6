@@ -1,0 +1,460 @@
+[
+ {
+  "order_id": "223800fd-1f85-4b3e-9af2-8cf13134aaf0",
+  "customer_name": "ANAND AUTO",
+  "order_date": "2026-08-24",
+  "slips": [
+   404
+  ],
+  "applied": {
+   "9e0e76c8-35c8-4b4e-bc81-171f6f4cce5e": 80,
+   "37769171-391e-4b72-bdb1-b09dd4b6a2d2": 30,
+   "0414ad96-47ba-4876-bd00-120e285de89d": 50,
+   "3c3943a1-9d55-469a-9ddb-05f68041ecdc": 100
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "7948a4c8-e603-4fd7-83c9-88fa21c7dcb9",
+  "customer_name": "MANCHANDA AUTO PARTS",
+  "order_date": "2026-09-29",
+  "slips": [
+   905
+  ],
+  "applied": {
+   "3ae664a8-2d2f-4ed0-b279-b6a42a95a69b": 55
+  },
+  "new_status": "Dispatched"
+ },
+ {
+  "order_id": "8875a2da-c23b-4772-b249-e1e5cc4859cc",
+  "customer_name": "AMRITSAR MOTOR CYCLE HOUSE",
+  "order_date": "2026-08-22",
+  "slips": [
+   394
+  ],
+  "applied": {
+   "605ea17b-e20d-45c5-a5d7-856d2f8d8361": 200
+  },
+  "new_status": "Dispatched"
+ },
+ {
+  "order_id": "73d78b8c-71aa-42ce-8d41-f61fec7f9435",
+  "customer_name": "SHRI LAXMI AUTO AGENICES",
+  "order_date": "2026-09-18",
+  "slips": [
+   727
+  ],
+  "applied": {
+   "40443935-5789-468c-a147-801d308327d9": 100
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "6b7ef958-1b45-42de-a6be-935470284a06",
+  "customer_name": "SUN AUTOMOBILES",
+  "order_date": "2026-08-21",
+  "slips": [
+   419
+  ],
+  "applied": {
+   "9bdb23fd-f0df-4843-928c-f7f7ddf1342b": 200
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "f0304185-5cf5-4fe3-8930-49b4df74e3bf",
+  "customer_name": "RUNECHA AUTOMOBILES",
+  "order_date": "2026-09-29",
+  "slips": [
+   938
+  ],
+  "applied": {
+   "9e0e76c8-35c8-4b4e-bc81-171f6f4cce5e": 200
+  },
+  "new_status": "Dispatched"
+ },
+ {
+  "order_id": "ccbee62f-46ba-4843-9053-b0b6b352124b",
+  "customer_name": "MEBESTO",
+  "order_date": "2026-09-03",
+  "slips": [
+   554
+  ],
+  "applied": {
+   "efd8a843-30b9-4bad-a905-72f224437d89": 74
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "c922e25b-4a93-4454-9b81-9c484855bf83",
+  "customer_name": "SIPCO AUTO PARTS",
+  "order_date": "2026-09-20",
+  "slips": [
+   944
+  ],
+  "applied": {
+   "3033df9a-1fae-40d5-a51e-9cb4e63e8d4f": 40
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "9f60047a-07fc-4674-8a69-bc9b57e3fa0e",
+  "customer_name": "SAHABAZ AUTO",
+  "order_date": "2026-08-22",
+  "slips": [
+   407
+  ],
+  "applied": {
+   "29322436-5f3f-484a-8bf6-ff3f27160a5c": 30
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "73ade0cf-8136-4fab-ba3e-21797a329ccb",
+  "customer_name": "BANSAL AUTO SPARES",
+  "order_date": "2026-09-28",
+  "slips": [
+   911,
+   941,
+   994
+  ],
+  "applied": {
+   "bae24583-4e31-4e3a-a69b-7a5f9e45195c": 80,
+   "3033df9a-1fae-40d5-a51e-9cb4e63e8d4f": 100,
+   "c26bbc45-ca5b-417e-b69e-ff8de3f3345b": 100
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "29a4a9fd-960b-420b-b36f-71ae68096cd3",
+  "customer_name": "KBS WORLD PRIVATE LIMITED",
+  "order_date": "2026-08-19",
+  "slips": [
+   330,
+   363,
+   405,
+   433
+  ],
+  "applied": {
+   "0cd1f42b-7631-4ec1-b836-d06fa7d3b5ee": 230,
+   "a31d9b9a-7667-4b64-8cba-61a2313a2c91": 64,
+   "278a2310-c593-4fb3-b1da-c22274a3aa49": 459,
+   "a619a798-03dc-4dda-bc5b-751a3d12c0d5": 30,
+   "0695a16b-502b-4c82-90d3-450ee6f47fb6": 1000,
+   "479e2da9-289c-4c9f-8f48-f839004c718f": 540,
+   "8f5ca027-e232-4d38-9d83-b526e039ba3e": 145,
+   "37769171-391e-4b72-bdb1-b09dd4b6a2d2": 200,
+   "9388e897-88d6-4574-9b8f-0cee28e784e6": 70,
+   "b9bee53c-3458-439d-9b0c-057639d7865c": 180,
+   "190d0b64-2005-40a2-b02b-5a0b08cd4895": 100
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "e8b0f81f-c946-441f-9574-540cbfd7a072",
+  "customer_name": "GROVER AUTO WORKS",
+  "order_date": "2026-08-29",
+  "slips": [
+   967
+  ],
+  "applied": {
+   "9388e897-88d6-4574-9b8f-0cee28e784e6": 65
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "766ece38-1d2d-458e-96b0-7d8cabc47776",
+  "customer_name": "KARNAVATI AUTOMOBILES",
+  "order_date": "2026-09-30",
+  "slips": [
+   912
+  ],
+  "applied": {
+   "3dec891f-0b7b-41e3-b51d-5754f0729d57": 180
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "dc55d21e-ee79-449a-bba5-e0921a49eb8d",
+  "customer_name": "POPULAR SCOOTERS",
+  "order_date": "2026-09-04",
+  "slips": [
+   894,
+   1017
+  ],
+  "applied": {
+   "5e13ce07-a399-464a-99dc-8486e22fe778": 80
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "b9d1b471-7e56-4716-aba2-d1350e67e80a",
+  "customer_name": "RAJESH AUTOMOTIVE",
+  "order_date": "2026-09-26",
+  "slips": [
+   974
+  ],
+  "applied": {
+   "c6f4fbc1-5adc-426a-84ce-759e3b56302c": 250
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "358e7058-10db-4a5a-9b8c-489e6814418d",
+  "customer_name": "GOLDY AUTOMOBILES",
+  "order_date": "2026-09-15",
+  "slips": [
+   717
+  ],
+  "applied": {
+   "a4634d33-4206-4f3a-946a-74d44c1e1fa8": 60
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "a1d0b8c8-fe2b-4725-be83-7bcb2bc6d4b6",
+  "customer_name": "RAJ SPARES",
+  "order_date": "2026-09-24",
+  "slips": [
+   871
+  ],
+  "applied": {
+   "aa73fb27-f355-481d-8257-047850da08e1": 40
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "d612387a-69a4-463d-ab4e-0ab27adcef8c",
+  "customer_name": "KRISHNA AUTO SPEARS",
+  "order_date": "2026-09-23",
+  "slips": [
+   802,
+   907
+  ],
+  "applied": {
+   "1449fef9-cb5f-4908-9f3b-cd5a1baf2adf": 20,
+   "104caecb-8f14-4e78-b905-8b7556a23f7c": 300,
+   "efd8a843-30b9-4bad-a905-72f224437d89": 60,
+   "48e5513c-4ac1-430a-bdc2-b51ed22c08ae": 40
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "e4970dff-16cc-4c9b-9c09-370f6cac0720",
+  "customer_name": "CAMP AUTOMOBILES PRIVATE LIMITED",
+  "order_date": "2026-09-19",
+  "slips": [
+   933
+  ],
+  "applied": {
+   "4d2c1a68-1fff-4b10-a8c6-94c95eea2df1": 100
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "fd013215-026b-4040-b6f7-d200e2f9d991",
+  "customer_name": "QMAX AUTO INDUSTRIES",
+  "order_date": "2026-08-21",
+  "slips": [
+   452
+  ],
+  "applied": {
+   "3033df9a-1fae-40d5-a51e-9cb4e63e8d4f": 50
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "e9c8c1b6-7b09-48f2-a66e-373b5b7af28b",
+  "customer_name": "GULATI AUTO PARTS",
+  "order_date": "2026-08-26",
+  "slips": [
+   412
+  ],
+  "applied": {
+   "4acdce8d-c245-40e0-ace5-61c06f5e2907": 180,
+   "605ea17b-e20d-45c5-a5d7-856d2f8d8361": 80
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "5dd7b32a-27d7-40c5-bd2e-0e632212f545",
+  "customer_name": "MAHALAXMI AUTOMOTIVE",
+  "order_date": "2026-09-24",
+  "slips": [
+   973
+  ],
+  "applied": {
+   "738109e8-59d6-4c11-af84-deb828a5c28b": 320
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "4625e16c-cfb0-4a57-87a7-ec0987c22cbc",
+  "customer_name": "MASCO AUTOMOBILES",
+  "order_date": "2026-09-23",
+  "slips": [
+   930
+  ],
+  "applied": {
+   "1c089ea2-d96f-4b05-a8a7-cedbf110acf3": 100,
+   "745a7c3f-8ad2-4804-90ce-ae6b2c52ca23": 50
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "11a1e2a1-4a7b-4f22-93a0-44812b33f2f4",
+  "customer_name": "SHIVA AUTO SPARES",
+  "order_date": "2026-08-11",
+  "slips": [
+   582
+  ],
+  "applied": {
+   "104caecb-8f14-4e78-b905-8b7556a23f7c": 200,
+   "06c23ab5-053e-472e-beb3-dd36088f24f0": 100,
+   "9997a4a0-e09b-4e59-8ae6-3d7cbe9b3300": 50,
+   "3653bcdb-1326-46f5-ad97-90a97b8fd926": 40,
+   "c1ca265a-0d71-464e-8ef7-04b169e52603": 50,
+   "3669900b-dd7c-476d-9b52-3c831f135f5d": 30,
+   "2456a9ca-4c25-4aa5-b135-3b5d2b4468f2": 50,
+   "1c9e1b1b-963f-4385-b66a-4715f91c8ca3": 50,
+   "622f65ce-8e1c-4016-aba8-55b9582746e6": 30
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "87885c66-afc1-4a0d-9c5e-2046ba04d310",
+  "customer_name": "NV AUTOMOBILES",
+  "order_date": "2026-08-24",
+  "slips": [
+   403
+  ],
+  "applied": {
+   "5e00b7b2-b289-4fb6-901b-9eda42df91cd": 200
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "52f539cb-bd7e-48f9-89b2-b56f0a3e2725",
+  "customer_name": "NV AUTOMOBILES",
+  "order_date": "2026-08-30",
+  "slips": [
+   594
+  ],
+  "applied": {
+   "551d648b-c169-4e88-af33-860e7d122aaf": 20
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "ca8ba4db-11fe-46ce-b1fe-ad37908d04cb",
+  "customer_name": "NV AUTOMOBILES",
+  "order_date": "2026-09-21",
+  "slips": [
+   817
+  ],
+  "applied": {
+   "f446c05c-ddfc-4fc4-9c4d-a03daa61a7b9": 300
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "8cc6fc5f-8270-4ad0-8aa5-696ce96fe907",
+  "customer_name": "VARDHMAN AUTO CENTRE",
+  "order_date": "2026-09-24",
+  "slips": [
+   875,
+   963
+  ],
+  "applied": {
+   "3ae664a8-2d2f-4ed0-b279-b6a42a95a69b": 200
+  },
+  "new_status": "Dispatched"
+ },
+ {
+  "order_id": "8f5448ec-6553-41ad-a64d-97b7b39aa82e",
+  "customer_name": "TRUMP AUTOMOTIVE",
+  "order_date": "2026-09-23",
+  "slips": [
+   987
+  ],
+  "applied": {
+   "4fd52f50-49be-4bba-8ddf-d9860d443ec9": 200
+  },
+  "new_status": "Dispatched"
+ },
+ {
+  "order_id": "64374fd7-9075-46d8-aa52-568fe50ee053",
+  "customer_name": "NV AGENCIES",
+  "order_date": "2026-09-29",
+  "slips": [
+   881,
+   928
+  ],
+  "applied": {
+   "574b06e2-fc35-408a-9d2c-1dad3c10a08e": 75,
+   "bae24583-4e31-4e3a-a69b-7a5f9e45195c": 250,
+   "8fe00713-1b90-46da-b04b-4df7891ca514": 150
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "f6961a5a-987e-4d21-9cb0-71604ba89d90",
+  "customer_name": "NK AGENCIES",
+  "order_date": "2026-09-28",
+  "slips": [
+   1005
+  ],
+  "applied": {
+   "8fc65402-892c-4fe1-a081-d123e352666a": 400
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "920d3f04-730d-45c1-a9a4-22e8cb1e568e",
+  "customer_name": "DILIP MOTOR CYCLE CO.",
+  "order_date": "2026-08-19",
+  "slips": [
+   327,
+   372
+  ],
+  "applied": {
+   "190d0b64-2005-40a2-b02b-5a0b08cd4895": 100,
+   "b9bee53c-3458-439d-9b0c-057639d7865c": 100
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "f53dd687-3217-4b37-be58-a600d322494e",
+  "customer_name": "AISLE AUTOTECH INDIA",
+  "order_date": "2026-09-01",
+  "slips": [
+   524
+  ],
+  "applied": {
+   "3653bcdb-1326-46f5-ad97-90a97b8fd926": 50
+  },
+  "new_status": "Pending"
+ },
+ {
+  "order_id": "3ebf5a1b-ae4b-412c-9e94-990ef9d96cb8",
+  "customer_name": "NIKAVI AUTOMOTIVE OVERSEAS COMPANY",
+  "order_date": "2026-09-22",
+  "slips": [
+   820,
+   851,
+   865,
+   893,
+   934
+  ],
+  "applied": {
+   "228e4d4e-ac5d-4320-8938-1928747c2037": 535,
+   "4fd52f50-49be-4bba-8ddf-d9860d443ec9": 100,
+   "2f4b038e-5950-4b75-a558-7c53d8add798": 200,
+   "06c23ab5-053e-472e-beb3-dd36088f24f0": 300,
+   "190d0b64-2005-40a2-b02b-5a0b08cd4895": 100,
+   "0414ad96-47ba-4876-bd00-120e285de89d": 100
+  },
+  "new_status": "Pending"
+ }
+]

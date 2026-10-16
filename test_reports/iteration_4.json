@@ -1,0 +1,26 @@
+{
+  "summary": "Validated the new Discrepancy Resolve+Undo feature end-to-end on /orders. Backend: all 4 resolve actions (clear/update_date/keep/delete) each produce a discrepancy_undo document and the sibling POST /api/orders/{id}/undo-discrepancy fully reverts order state (items, order_date, status, discrepancy_dismissed) AND the linked dispatch (order_ids / order_fully_dispatched are restored to pre-clear snapshot). Delete-then-undo re-creates the order with the same id. POST /api/orders/{id}/undo-discrepancy with no prior resolution correctly returns 404 'Nothing to undo for this order'. Frontend (UI): orders-filter -> orders-tab-discrepancy renders order-discrepancy-{id} card for the seeded QA order; clicking disc-clear-{id} shows a sonner toast containing an inline 'Undo' action button (clicking it immediately restores the discrepancy card). After leaving the toast, switching to All Status filter reveals the persistent disc-undo-bar-{id} amber chip with disc-undo-btn-{id} ('Timing discrepancy resolved: Cleared · 10/14/2026 Undo'); clicking it removes the bar and restores the discrepancy card. Hindi toggle (lang-btn-hi) correctly translates sidebar + discrepancy card buttons (संभावित तिथि विसंगति / पहले ही डिस्पैच — क्लियर करें / ऑर्डर तिथि अपडेट करें / लंबित रखें / एंट्री हटाएँ) and the undo bar/button key discResolvedAs/discUndo resolve to Hindi text. All QA data (11 customers, 7 dispatches, 1 order) and the temporary qa_tester user were cleaned up at the end.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_discrepancy_undo.py",
+    "/app/test_reports/pytest/discrepancy_undo.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py resolve_discrepancy() upserts discrepancy_undo but captures only disp_before for the 'clear' action — update_date / keep / delete reversibility relies solely on 'order_before'. That's fine today, but if a future action starts touching dispatches (e.g. update_date aligning dispatch allocations), the undo will silently miss that side-effect. Consider centralising the snapshot (order_before + relevant_dispatch_before + any inventory_delta) in one helper so future actions can't skip it.",
+    "undo_discrepancy() uses db.orders.replace_one({id}, before, upsert=True) which is correct for delete-then-undo, but if the order's _id ObjectId was retained in the stored snapshot it would be re-inserted — safer to project {_id:0} when snapshotting (resolve_discrepancy already does this via find_one projection, so it's actually fine; worth a comment noting the invariant).",
+    "list_orders() attaches o['discrepancy_undo'] from the undo_map but there's no TTL on discrepancy_undo collection. If users never click Undo, these snapshot documents (full order payload) accumulate forever. Consider a background sweep that deletes entries older than, say, 7 days OR when the order is subsequently edited by any other PATCH path.",
+    "Orders.jsx resolveDiscrepancy() shows the toast's Undo action only for the lifespan of the toast (8s). The disc-undo-bar is the only persistent undo surface — that's correct, but worth adding a tooltip/aria-label so screen-reader users understand what 'Undo' refers to without the preceding sentence."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_discrepancy_undo.py (new)"
+  ],
+  "success_rate": {"backend": "100% (5/5 pytest tests)", "frontend": "100% (all 5 UI flows: card visible, toast-undo, undo-bar+btn appears, undo-bar restores card, Hindi labels)"},
+  "test_credentials": "qa_tester / QaTest#2026 was recreated via direct Mongo insert into db.users (fields: id=uuid, username, email, is_admin, role, otp_enabled=false, password=bcrypt('QaTest#2026')). DELETED at end of this iteration — recreate if next iteration needs admin access.",
+  "seed_data_creation": "Each pytest test creates its own QA TEST DISC <hex> customer + off-order dispatch (yesterday) + 2-item order (today), and the UI test created QA TEST UI DISC. ALL seed data (11 customers, 7 dispatches, 1 lingering order) deleted at the end. No orphan discrepancy_undo docs left (undo endpoint hit before order delete).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "qa_tester is NOT persisted — recreate as described above and REMEMBER to also set `id` (UUID) on the user doc, otherwise /api/auth/login throws 500 (KeyError 'id' in create_token). bcrypt in /root/.venv prints 'error reading bcrypt version' at hash() time — harmless; verify works. The off-order dispatch 'Item not found' error means you forgot item_name/item_id lookup against db.items (NOT db.products). The order endpoint requires product_name on each item line too. The frontend has only ONE lang-btn-hi element at a time (bottom-left in the sidebar footer when authenticated, bottom-center on /login). On the /orders page the 'all' filter option label is 'All Status' (en) / 'सभी स्थिति' (hi) — match by startswith('all') case-insensitive or 'सभी'.",
+  "rca of the issue": "n/a — feature validation. All resolve actions + undo work exactly as specified in the review request."
+}
