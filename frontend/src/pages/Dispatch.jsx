@@ -36,15 +36,15 @@ export default function Dispatch() {
       )}
 
       <Tabs defaultValue="stock-match" className="w-full">
-        <TabsList className="bg-slate-100 h-10 p-1 rounded-sm w-full sm:w-auto">
-          <TabsTrigger value="stock-match" data-testid="tab-stock-match" className="rounded-sm h-8 px-3 sm:px-4 flex-1 sm:flex-none text-xs sm:text-sm">
-            <Boxes className="w-3.5 h-3.5 mr-1.5" /> {t("dispatch.tabStockMatch")}
+        <TabsList className="bg-slate-100 h-auto sm:h-10 p-1 rounded-sm w-full sm:w-auto grid grid-cols-3 sm:inline-flex gap-1 sm:gap-0">
+          <TabsTrigger value="stock-match" data-testid="tab-stock-match" className="rounded-sm h-9 sm:h-8 px-1.5 sm:px-4 min-w-0 sm:flex-none text-xs sm:text-sm">
+            <Boxes className="w-3.5 h-3.5 mr-1 sm:mr-1.5 shrink-0" /> <span className="sm:hidden truncate">{t("dispatch.tabStockMatch").split(" ")[0]}</span><span className="hidden sm:inline">{t("dispatch.tabStockMatch")}</span>
           </TabsTrigger>
-          <TabsTrigger value="direct" data-testid="tab-direct" className="rounded-sm h-8 px-3 sm:px-4 flex-1 sm:flex-none text-xs sm:text-sm">
-            <Truck className="w-3.5 h-3.5 mr-1.5" /> {t("dispatch.tabDirect")}
+          <TabsTrigger value="direct" data-testid="tab-direct" className="rounded-sm h-9 sm:h-8 px-1.5 sm:px-4 min-w-0 sm:flex-none text-xs sm:text-sm">
+            <Truck className="w-3.5 h-3.5 mr-1 sm:mr-1.5 shrink-0" /> <span className="sm:hidden truncate">{t("dispatch.tabDirect").split(" ")[0]}</span><span className="hidden sm:inline">{t("dispatch.tabDirect")}</span>
           </TabsTrigger>
-          <TabsTrigger value="off-order" data-testid="tab-off-order" className="rounded-sm h-8 px-3 sm:px-4 flex-1 sm:flex-none text-xs sm:text-sm">
-            <UserPlus className="w-3.5 h-3.5 mr-1.5" /> {t("dispatch.tabOffOrder")}
+          <TabsTrigger value="off-order" data-testid="tab-off-order" className="rounded-sm h-9 sm:h-8 px-1.5 sm:px-4 min-w-0 sm:flex-none text-xs sm:text-sm">
+            <UserPlus className="w-3.5 h-3.5 mr-1 sm:mr-1.5 shrink-0" /> <span className="sm:hidden truncate">{t("dispatch.tabOffOrder").split(" ")[0]}</span><span className="hidden sm:inline">{t("dispatch.tabOffOrder")}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -289,14 +289,14 @@ function StockMatchDispatch() {
         </div>
 
         {/* Dispatch date — applies to every slip dispatched from this panel */}
-        <div className="mb-4 flex items-center justify-between gap-3 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-sm">
-          <div className="flex items-center gap-2 min-w-0">
+        <div className="mb-4 flex items-center justify-between gap-2 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-sm">
+          <div className="flex items-center gap-2 shrink-0">
             <CalendarDays className="w-4 h-4 text-[#E65100] shrink-0" />
-            <div className="text-[10px] uppercase tracking-[0.15em] font-bold text-slate-600 whitespace-nowrap">
+            <div className="text-[10px] uppercase tracking-wider sm:tracking-[0.15em] font-bold text-slate-600 whitespace-nowrap">
               Dispatch date
             </div>
           </div>
-          <div className="w-48">
+          <div className="w-36 sm:w-48 min-w-0">
             <DatePicker
               value={dispatchDate}
               onChange={setDispatchDate}
@@ -750,7 +750,7 @@ function DirectDispatch() {
             <span className="text-[10px] uppercase tracking-wider font-bold text-slate-600 whitespace-nowrap">
               Dispatch date
             </span>
-            <div className="w-44">
+            <div className="w-36 sm:w-44">
               <DatePicker
                 value={dispatchDate}
                 onChange={setDispatchDate}
@@ -1097,8 +1097,8 @@ function OffOrderDispatch() {
         </div>
         {!customer ? (
           <div className="relative">
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <div className="relative flex-1 w-full">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <Input
                   data-testid="off-order-customer-input"
@@ -1115,7 +1115,7 @@ function OffOrderDispatch() {
                 onClick={useWalkIn}
                 disabled={!custQuery.trim()}
                 data-testid="off-order-walkin-btn"
-                className="rounded-sm h-10 whitespace-nowrap"
+                className="rounded-sm h-10 whitespace-nowrap w-full sm:w-auto"
               >
                 <UserPlus className="w-4 h-4 mr-1" /> {t("dispatch.offOrder.useAsWalkIn")}
               </Button>
