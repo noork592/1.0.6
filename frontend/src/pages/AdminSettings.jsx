@@ -12,7 +12,7 @@ import ResyncOrders from "@/components/ResyncOrders";
 
 // Software release version — surfaced in Admin Settings so operators can
 // quickly confirm which build they are running when reporting issues.
-const APP_VERSION = "1.0.5";
+import { APP_VERSION } from "@/constants/version";
 
 export default function AdminSettings() {
   const { t } = useTranslation();
