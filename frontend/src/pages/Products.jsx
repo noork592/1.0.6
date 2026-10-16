@@ -288,15 +288,15 @@ export default function Products() {
             {t("products.subtitle")}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-none min-w-0">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search products or SKUs…"
               data-testid="products-search"
-              className="h-10 rounded-sm pl-9 pr-8 w-64 border-slate-300"
+              className="h-10 rounded-sm pl-9 pr-8 w-full sm:w-64 border-slate-300"
             />
             {search && (
               <button
@@ -311,8 +311,8 @@ export default function Products() {
           </div>
           {canAct("add:products") && (
             <Button onClick={() => setShowAdd(true)} data-testid="add-product-btn"
-                    className="bg-[#E65100] hover:bg-[#CC4800] text-white rounded-sm h-10 px-4 font-bold">
-              <Plus className="w-4 h-4 mr-1.5" /> {t("products.newProduct")}
+                    className="bg-[#E65100] hover:bg-[#CC4800] text-white rounded-sm h-10 px-3 sm:px-4 font-bold shrink-0">
+              <Plus className="w-4 h-4 mr-1 sm:mr-1.5" /> <span className="sm:hidden">{t("nav.new")}</span><span className="hidden sm:inline">{t("products.newProduct")}</span>
             </Button>
           )}
         </div>
