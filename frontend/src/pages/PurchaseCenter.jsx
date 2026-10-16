@@ -804,7 +804,7 @@ export default function PurchaseCenter() {
 // Mirrors the vendor-picker UX: a search input that opens a suggestion
 // dropdown; once picked, shows a compact pill with name + unit + a clear (X).
 // =========================================================================
-function RawMaterialPicker({ rawMaterials, value, selectedName, onPick, testidPrefix }) {
+export function RawMaterialPicker({ rawMaterials, value, selectedName, onPick, testidPrefix }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);

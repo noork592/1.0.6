@@ -20,6 +20,7 @@ import LedgerPrintDialog from "@/components/LedgerPrintDialog";
 import { todayIso, isoDaysAgo } from "@/lib/dates";
 import { useAuth } from "@/lib/auth";
 import { Label } from "@/components/ui/label";
+import { RawMaterialPicker } from "@/pages/PurchaseCenter";
 
 const fmt = (v) => Number(v || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
 
@@ -564,6 +565,12 @@ function EditPurchaseDialog({ open, purchase, onClose, onSaved }) {
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
   const [vendorPrices, setVendorPrices] = useState({});
+  const [rawMaterials, setRawMaterials] = useState([]);
+
+  useEffect(() => {
+    if (!open) return;
+    api.get("/raw-materials").then((r) => setRawMaterials(r.data || [])).catch(() => setRawMaterials([]));
+  }, [open]);
 
   useEffect(() => {
     if (!purchase) { setForm(null); return; }
@@ -613,6 +620,18 @@ function EditPurchaseDialog({ open, purchase, onClose, onSaved }) {
 
   const update = (idx, patch) =>
     setForm((f) => ({ ...f, items: f.items.map((it, i) => i === idx ? { ...it, ...patch } : it) }));
+
+  const onPickRawMaterial = (idx, rmId) => {
+    const rm = rawMaterials.find((x) => x.id === rmId);
+    if (!rm) { update(idx, { raw_material_id: null, name: "", unit: "", rate: "" }); return; }
+    const vp = vendorPrices[String(rm.name).trim().toLowerCase()];
+    update(idx, {
+      raw_material_id: rm.id,
+      name: rm.name,
+      unit: rm.unit || vp?.unit || "",
+      rate: vp ? String(vp.price) : "",
+    });
+  };
 
   const addLine = () => setForm((f) => ({
     ...f,
@@ -686,7 +705,7 @@ function EditPurchaseDialog({ open, purchase, onClose, onSaved }) {
               />
             </div>
           </div>
-          <div className="border border-slate-200 rounded-sm overflow-hidden">
+          <div className="border border-slate-200 rounded-sm">
             <div className="bg-slate-50 px-3 py-2 text-[11px] uppercase tracking-wider font-bold text-slate-600">
               Raw material line items
             </div>
@@ -709,11 +728,12 @@ function EditPurchaseDialog({ open, purchase, onClose, onSaved }) {
                   return (
                     <tr key={idx} className="border-t border-slate-100">
                       <td className="px-2 py-1.5">
-                        <Input
-                          value={it.name}
-                          onChange={(e) => update(idx, { name: e.target.value })}
-                          data-testid={`edit-purchase-line-${idx}-name`}
-                          className="h-9 rounded-sm"
+                        <RawMaterialPicker
+                          rawMaterials={rawMaterials}
+                          value={it.raw_material_id || rawMaterials.find((x) => x.name.trim().toLowerCase() === String(it.name || "").trim().toLowerCase())?.id}
+                          selectedName={it.name}
+                          onPick={(rmId) => onPickRawMaterial(idx, rmId)}
+                          testidPrefix={`edit-purchase-line-${idx}`}
                         />
                         {vp && (
                           <div className="text-[10px] text-emerald-700 mt-0.5 truncate" title={vp.source_list}>
