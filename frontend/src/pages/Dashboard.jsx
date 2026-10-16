@@ -3,6 +3,7 @@ import { api } from "@/lib/api";
 import { useTranslation } from "react-i18next";
 import { Boxes, Package, Truck, CheckCircle2, Users, ChevronRight, ChevronDown, Settings2, AlertTriangle, Clock, Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/auth";
 
 const STAT_CARDS = [
   { key: "total_orders",      i18nKey: "total",      icon: Boxes,         accent: "text-slate-700",  testid: "stat-total",      to: "/orders" },
@@ -15,6 +16,7 @@ const STAT_CARDS = [
 
 export default function Dashboard() {
   const { t } = useTranslation();
+  const { can } = useAuth();
   const nav = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,10 +38,10 @@ export default function Dashboard() {
           <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900">{t("dashboard.title")}</h1>
           <p className="text-slate-500 text-sm mt-1">{t("dashboard.subtitle")}</p>
         </div>
-        <Link to="/orders/new" data-testid="dashboard-new-order"
+        {(can("newOrder") || can("orders")) && <Link to="/orders/new" data-testid="dashboard-new-order"
               className="hidden sm:inline-flex bg-slate-900 text-white px-4 py-2 rounded-sm text-sm font-bold hover:bg-black transition">
           {t("dashboard.createOrder")}
-        </Link>
+        </Link>}
       </div>
 
       {/* Stats Grid — clickable */}

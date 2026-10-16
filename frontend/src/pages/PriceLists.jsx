@@ -743,6 +743,7 @@ export default function PriceLists() {
                   value={d.discount_value}
                   type={d.discount_type}
                   onSave={saveDiscount}
+                  readOnly={!canEdit}
                 />
               );
             })}
@@ -776,6 +777,7 @@ export default function PriceLists() {
                 row={r}
                 saving={savingRow === r.item_id}
                 onSave={(p) => saveRow(r, p)}
+                readOnly={!canEdit}
               />
             ))}
           </div>
@@ -794,7 +796,7 @@ export default function PriceLists() {
   );
 }
 
-function PriceRow({ row, onSave, saving }) {
+function PriceRow({ row, onSave, saving, readOnly }) {
   const [val, setVal] = useState(String(row.price ?? 0));
   useEffect(() => { setVal(String(row.price ?? 0)); }, [row.price]);
   const dirty = parseFloat(val || "0") !== parseFloat(row.price || 0);
@@ -832,6 +834,7 @@ function PriceRow({ row, onSave, saving }) {
             min="0"
             step="0.01"
             value={val}
+            disabled={readOnly}
             onChange={(e) => setVal(e.target.value)}
             onFocus={(e) => { if (parseFloat(val || "0") === 0) setVal(""); e.target.select(); }}
             onBlur={() => {
@@ -842,7 +845,7 @@ function PriceRow({ row, onSave, saving }) {
             className="no-spinner h-9 w-28 pl-7 rounded-sm font-mono-num text-right"
           />
         </div>
-        {dirty && (
+        {dirty && !readOnly && (
           <Button
             size="sm"
             onClick={() => onSave(val)}
@@ -857,7 +860,7 @@ function PriceRow({ row, onSave, saving }) {
   );
 }
 
-function DiscountRow({ category, value, type, onSave }) {
+function DiscountRow({ category, value, type, onSave, readOnly }) {
   const [val, setVal] = useState(String(value || 0));
   const [tp, setTp] = useState(type || "");
   useEffect(() => { setVal(String(value || 0)); setTp(type || ""); }, [value, type]);
@@ -881,6 +884,7 @@ function DiscountRow({ category, value, type, onSave }) {
           min="0"
           step="0.01"
           value={val}
+          disabled={readOnly}
           onChange={(e) => setVal(e.target.value)}
           onFocus={(e) => { if (parseFloat(val || "0") === 0) setVal(""); e.target.select(); }}
           onBlur={() => { if (val === "" || val === "-" || val === ".") setVal("0"); }}
@@ -890,6 +894,7 @@ function DiscountRow({ category, value, type, onSave }) {
         <div className="flex">
           <button
             type="button"
+            disabled={readOnly}
             onClick={() => setTp(tp === "₹" ? "" : "₹")}
             data-testid={`discount-type-rs-${category}`}
             className={`h-9 px-2 rounded-l-sm border text-xs font-bold ${tp === "₹" ? "bg-[#E65100] text-white border-[#E65100]" : `bg-white text-slate-700 ${needsType ? "border-rose-400" : "border-slate-300"}`}`}
@@ -898,6 +903,7 @@ function DiscountRow({ category, value, type, onSave }) {
           </button>
           <button
             type="button"
+            disabled={readOnly}
             onClick={() => setTp(tp === "%" ? "" : "%")}
             data-testid={`discount-type-pct-${category}`}
             className={`h-9 px-2 rounded-r-sm border -ml-px text-xs font-bold ${tp === "%" ? "bg-[#E65100] text-white border-[#E65100]" : `bg-white text-slate-700 ${needsType ? "border-rose-400" : "border-slate-300"}`}`}
@@ -905,7 +911,7 @@ function DiscountRow({ category, value, type, onSave }) {
             <Percent className="w-3 h-3 inline -mt-0.5" />
           </button>
         </div>
-        <Button
+        {!readOnly && <Button
           size="sm"
           onClick={() => onSave(category, val, tp)}
           disabled={!dirty}
@@ -913,7 +919,7 @@ function DiscountRow({ category, value, type, onSave }) {
           className="bg-[#E65100] hover:bg-[#CC4800] text-white rounded-sm h-9 px-3 disabled:opacity-40"
         >
           <Save className="w-3.5 h-3.5" />
-        </Button>
+        </Button>}
       </div>
     </div>
   );

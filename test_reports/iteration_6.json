@@ -1,0 +1,36 @@
+{
+  "summary": "Verified fix for non-admin action-permission gating (gagan 'Admin only.' bug) using qaprice (role=user) and qaadmin. Backend: 6/6 pytest pass (create/rename/bill-toggle/item price/category discount/delink/clone/delete as qaprice; after revoking add/edit/delete:priceLists via PATCH /users/{id}/permissions all mutating endpoints return 403 while GET stays 200; perms restored). Frontend: qaprice sees Customer Price Lists page (no 'Admin only.'), New price list, Edit name, Clone, Bill-required switch, Delete (only when delete:priceLists granted - hidden when revoked, verified both states), detail page Upload Excel + De-link, item price (77) and category discount saved & persisted; delete via confirm dialog works. Vendor price lists page loads for qaprice with New vendor price list visible and list-delete hidden. Products: New Product + Add SKU visible; Customers: Download template / Import Excel / New Customer visible. qaadmin still sees all buttons on all these pages. All QA price lists cleaned up.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/price-lists/{id}/clone", "issue": "Clone does not copy bill_amount_required from source list (new list defaults to required)."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "VendorPriceLists detail (ItemRow)", "issue": "Per-item delete buttons and editable name/unit/price inputs are shown to users WITHOUT edit:/delete:vendorPriceLists (qaprice saw 56 delete buttons). Clicking would hit backend 403. Same class of bug the user reported - gate with canAct('delete:vendorPriceLists') / canAct('edit:vendorPriceLists'); 'Add item' + 'Upload Excel' correctly need add:.", "selector": "[data-testid^='vendor-item-delete-'], [data-testid^='vendor-item-price-'], [data-testid^='vendor-item-name-']", "priority": "MEDIUM"},
+      {"component": "PriceLists detail (PriceRow / DiscountRow)", "issue": "Item price inputs and discount save buttons are not gated by canEdit; a user with priceLists nav but no edit:priceLists will see editable fields and get 403 toasts.", "selector": "[data-testid^='price-input-'], [data-testid^='discount-save-']", "priority": "LOW"},
+      {"component": "Layout topbar + Dashboard", "issue": "'New Order' (topbar-new-order) and Dashboard '+ Create Order' shown to users without newOrder/orders/add:orders (qaprice); clicking silently redirects back to Dashboard. Hide when !can('newOrder') && !can('orders').", "selector": "[data-testid='topbar-new-order']", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/test_action_permissions_pricelists.py", "/app/test_reports/pytest/pytest_action_perms.xml"],
+  "action_items": [
+    "Gate VendorPriceLists item-row delete/edit controls with canAct('delete:vendorPriceLists') / canAct('edit:vendorPriceLists')",
+    "Make PriceLists PriceRow/DiscountRow read-only when !canEdit",
+    "Hide topbar 'New Order' and dashboard 'Create Order' for users lacking order permissions",
+    "Optional: copy bill_amount_required on price-list clone"
+  ],
+  "critical_code_review_comments": [
+    "server.py is ~9.9k lines - should be split into routers",
+    "During testing an actor with username 'admin' (not this agent) removed delete:priceLists from qaprice at 12:18:51 UTC (see /api/users/{id}/permissions/audit); restored by tester to the requested set. If unexpected, investigate who is using the 'admin' account concurrently."
+  ],
+  "updated_files": ["/app/backend/tests/test_action_permissions_pricelists.py"],
+  "success_rate": {"backend": "100%", "frontend": "100% of requested flows (3 minor gating gaps found outside requested scope)"},
+  "test_credentials": "qaadmin / QaAdmin@123 (admin), qaprice / QaPrice@123 (user). /app/memory/test_credentials.md is stale (lists admin@factory.com/admin123 from seed) - update it with qa accounts.",
+  "seed_data_creation": "Created TEST_QA_* price lists during tests; all deleted. qaprice permissions left at: dashboard, priceLists, vendorPriceLists, products, customers, add/edit/delete:priceLists, add:vendorPriceLists, add:products, add:customers.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Real production data in DB - only touch TEST_QA_* records and qa users. Login placeholder 'Email address or mobile number', button 'Log in'. Token in localStorage foms_token, user in foms_user. Price list rows load async - wait for '[data-testid^=price-list-row-]' before counting buttons. Vendor price list page loads slowly (>3s)."
+}

@@ -19,6 +19,7 @@ const fmt = (n) => `₹${Number(n || 0).toLocaleString("en-IN", { minimumFractio
 export default function VendorPriceLists() {
   const { isAdmin, can, canAct } = useAuth();
   const canAdd = canAct("add:vendorPriceLists");
+  const canEdit = canAct("edit:vendorPriceLists");
   const canDelete = canAct("delete:vendorPriceLists");
   const [lists, setLists] = useState([]);
   const [vendors, setVendors] = useState([]);
@@ -511,6 +512,8 @@ export default function VendorPriceLists() {
                 row={row}
                 onSave={(patch) => updateItem(row, patch)}
                 onDelete={() => setConfirmDel({ kind: "item", target: row })}
+                canEdit={canEdit}
+                canDelete={canDelete}
               />
             ))}
           </div>
@@ -600,7 +603,7 @@ export default function VendorPriceLists() {
   );
 }
 
-function VendorItemRow({ row, onSave, onDelete }) {
+function VendorItemRow({ row, onSave, onDelete, canEdit, canDelete }) {
   const [name, setName] = useState(row.name || "");
   const [unit, setUnit] = useState(row.unit || "");
   const [price, setPrice] = useState(String(row.price ?? 0));
@@ -629,6 +632,7 @@ function VendorItemRow({ row, onSave, onDelete }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           onBlur={persist}
+          disabled={!canEdit}
           data-testid={`vendor-item-name-${row.id}`}
           className="col-span-7 h-9 rounded-sm font-bold"
         />
@@ -637,6 +641,7 @@ function VendorItemRow({ row, onSave, onDelete }) {
           onChange={(e) => setUnit(e.target.value)}
           onBlur={persist}
           placeholder="unit"
+          disabled={!canEdit}
           data-testid={`vendor-item-unit-${row.id}`}
           className="col-span-2 h-9 rounded-sm"
         />
@@ -645,6 +650,7 @@ function VendorItemRow({ row, onSave, onDelete }) {
           <Input
             type="number" min="0" step="0.01"
             value={price}
+            disabled={!canEdit}
             onChange={(e) => setPrice(e.target.value)}
             onFocus={(e) => { if (Number(price || 0) === 0) setPrice(""); e.target.select(); }}
             onBlur={() => { if (price === "" || price === "-" || price === ".") setPrice("0"); persist(); }}
@@ -654,7 +660,7 @@ function VendorItemRow({ row, onSave, onDelete }) {
         </div>
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        {dirty && (
+        {dirty && canEdit && (
           <Button
             size="sm"
             onClick={persist}
@@ -664,7 +670,7 @@ function VendorItemRow({ row, onSave, onDelete }) {
             <Save className="w-3.5 h-3.5" />
           </Button>
         )}
-        <Button
+        {canDelete && <Button
           size="sm"
           variant="outline"
           onClick={onDelete}
@@ -672,7 +678,7 @@ function VendorItemRow({ row, onSave, onDelete }) {
           className="rounded-sm h-9 border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700"
         >
           <Trash2 className="w-3.5 h-3.5" />
-        </Button>
+        </Button>}
       </div>
     </div>
   );

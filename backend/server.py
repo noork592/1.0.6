@@ -4163,6 +4163,7 @@ async def clone_price_list(plid: str, body: PriceListCloneIn, admin=Depends(requ
         "id": new_id,
         "name": new_name,
         "description": new_desc,
+        "bill_amount_required": src.get("bill_amount_required", True),
         "created_at": now,
         "updated_at": now,
     }

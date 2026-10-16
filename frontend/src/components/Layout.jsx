@@ -172,10 +172,10 @@ export default function Layout() {
           <div className="ml-auto flex items-center gap-2">
             <NotificationCenter />
             <LanguageSwitcher />
-            <Button onClick={() => nav("/orders/new")} data-testid="topbar-new-order"
+            {(can("newOrder") || can("orders")) && <Button onClick={() => nav("/orders/new")} data-testid="topbar-new-order"
                     className="bg-[#E65100] hover:bg-[#CC4800] text-white rounded-sm h-10 px-4 font-bold active:scale-[0.98]">
               <Plus className="w-4 h-4 mr-1.5" /> <span className="hidden sm:inline">{t("nav.newOrder")}</span><span className="sm:hidden">{t("nav.new")}</span>
-            </Button>
+            </Button>}
           </div>
         </header>
 
