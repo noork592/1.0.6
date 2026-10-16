@@ -367,7 +367,7 @@ export default function PriceLists() {
                 <div
                   key={pl.id}
                   data-testid={`price-list-row-${pl.id}`}
-                  className="p-4 sm:p-5 flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors"
+                  className="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-3 hover:bg-slate-50 transition-colors"
                 >
                   <button
                     onClick={() => setActive(pl)}
@@ -378,15 +378,15 @@ export default function PriceLists() {
                     {pl.description && (
                       <div className="text-xs text-slate-500 mt-0.5">{pl.description}</div>
                     )}
-                    <div className="flex gap-3 mt-1.5 flex-wrap">
-                      <span className="text-[10px] uppercase tracking-wider font-bold bg-orange-50 border border-orange-200 text-orange-900 px-2 py-1 rounded-sm">
+                    <div className="flex gap-2 mt-1.5 flex-wrap">
+                      <span className="text-[10px] uppercase tracking-wider font-bold bg-orange-50 border border-orange-200 text-orange-900 px-2 py-1 rounded-sm whitespace-nowrap">
                         {pl.items_count} items priced
                       </span>
-                      <span className="text-[10px] uppercase tracking-wider font-bold bg-slate-50 border border-slate-200 text-slate-700 px-2 py-1 rounded-sm">
+                      <span className="text-[10px] uppercase tracking-wider font-bold bg-slate-50 border border-slate-200 text-slate-700 px-2 py-1 rounded-sm whitespace-nowrap">
                         {pl.discounts_count} category discounts
                       </span>
                       <span
-                        className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-sm border ${
+                        className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-sm border whitespace-nowrap ${
                           pl.customers_count > 0
                             ? "bg-emerald-50 border-emerald-200 text-emerald-800"
                             : "bg-slate-50 border-slate-200 text-slate-500"
@@ -396,7 +396,7 @@ export default function PriceLists() {
                         {pl.customers_count || 0} customer{pl.customers_count === 1 ? "" : "s"} linked
                       </span>
                       <span
-                        className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-sm border inline-flex items-center gap-1 ${
+                        className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-sm border inline-flex items-center gap-1 whitespace-nowrap ${
                           (pl.bill_amount_required ?? true)
                             ? "bg-orange-50 border-orange-200 text-orange-900"
                             : "bg-slate-100 border-slate-300 text-slate-600"
@@ -411,13 +411,14 @@ export default function PriceLists() {
                       </span>
                     </div>
                   </button>
+                  <div className="flex flex-wrap items-center gap-2 shrink-0" data-testid={`price-list-actions-${pl.id}`}>
                   {canEdit && (
                     <div
-                      className="flex flex-col items-center gap-0.5 pr-2 border-r border-slate-200"
+                      className="flex items-center gap-2 pr-2 border-r border-slate-200"
                       onClick={(e) => e.stopPropagation()}
                       data-testid={`price-list-billreq-wrap-${pl.id}`}
                     >
-                      <span className="text-[9px] uppercase tracking-wider font-bold text-slate-500">
+                      <span className="text-[9px] uppercase tracking-wider font-bold text-slate-500 whitespace-nowrap">
                         Bill required
                       </span>
                       <Switch
@@ -464,6 +465,7 @@ export default function PriceLists() {
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>}
+                  </div>
                 </div>
               ))}
             </div>
