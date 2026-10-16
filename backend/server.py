@@ -1744,7 +1744,7 @@ async def bulk_delete_customers(body: CustomerBulkDeleteIn, admin=Depends(requir
 
 
 @api_router.get("/customers/import/template")
-async def customer_import_template(admin=Depends(require_admin)):
+async def customer_import_template(admin=Depends(require_action("add:customers"))):
     """Download a blank Excel template for bulk customer import."""
     from openpyxl import Workbook
     from fastapi.responses import StreamingResponse
@@ -4207,7 +4207,7 @@ async def clone_price_list(plid: str, body: PriceListCloneIn, admin=Depends(requ
 
 
 @api_router.post("/price-lists/{plid}/delink-customers")
-async def delink_price_list_from_customers(plid: str, admin=Depends(require_admin)):
+async def delink_price_list_from_customers(plid: str, admin=Depends(require_action("edit:priceLists"))):
     """Task 3 — Bulk-detach a price list from every customer currently
     assigned to it. The list itself remains intact (items + discounts
     preserved); only the per-customer `price_list_id` references are
@@ -4250,7 +4250,7 @@ async def get_price_list_detail(plid: str, user=Depends(get_current_user)):
 
 
 @api_router.post("/price-lists/{plid}/items")
-async def set_price_list_item(plid: str, body: PriceListItemIn, admin=Depends(require_admin)):
+async def set_price_list_item(plid: str, body: PriceListItemIn, admin=Depends(require_action("edit:priceLists"))):
     pl = await db.price_lists.find_one({"id": plid}, {"_id": 0})
     if not pl:
         raise HTTPException(status_code=404, detail="Price list not found")
@@ -4274,7 +4274,7 @@ async def set_price_list_item(plid: str, body: PriceListItemIn, admin=Depends(re
 
 
 @api_router.post("/price-lists/{plid}/discounts")
-async def set_price_list_category_discount(plid: str, body: CategoryDiscountIn, admin=Depends(require_admin)):
+async def set_price_list_category_discount(plid: str, body: CategoryDiscountIn, admin=Depends(require_action("edit:priceLists"))):
     pl = await db.price_lists.find_one({"id": plid}, {"_id": 0})
     if not pl:
         raise HTTPException(status_code=404, detail="Price list not found")
@@ -6757,7 +6757,7 @@ async def delete_vendor_price_list_item(vpl_id: str, vpi_id: str, admin=Depends(
 
 
 @api_router.get("/vendor-price-lists/{vpl_id}/import/template")
-async def vendor_price_list_import_template(vpl_id: str, admin=Depends(require_admin)):
+async def vendor_price_list_import_template(vpl_id: str, admin=Depends(require_action("add:vendorPriceLists"))):
     """Download a blank Excel template for bulk vendor-price-list item import."""
     from openpyxl import Workbook
     from fastapi.responses import StreamingResponse
@@ -7957,7 +7957,7 @@ async def list_rm_movements(rid: str, limit: int = 100, user=Depends(get_current
 
 
 @api_router.post("/raw-materials/{rid}/adjust")
-async def adjust_rm_stock(rid: str, body: RawMaterialAdjustIn, admin=Depends(require_admin)):
+async def adjust_rm_stock(rid: str, body: RawMaterialAdjustIn, admin=Depends(require_action("edit:rawMaterials"))):
     """Manual ± stock adjustment. Logged in `raw_material_movements`."""
     if body.delta == 0:
         raise HTTPException(status_code=400, detail="delta cannot be zero")

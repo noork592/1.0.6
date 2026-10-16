@@ -249,7 +249,7 @@ export default function Customers() {
           <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900">{t("customers.title")}</h1>
           <p className="text-slate-500 text-sm mt-1">{t("customers.subtitle")}</p>
         </div>
-        {isAdmin && (
+        {canAct("add:customers") && (
           <div className="flex items-center gap-2 flex-wrap">
             <Button onClick={downloadTemplate} data-testid="customers-download-template-btn"
                     variant="outline"

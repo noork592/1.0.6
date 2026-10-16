@@ -309,7 +309,7 @@ export default function Products() {
               </button>
             )}
           </div>
-          {isAdmin && (
+          {canAct("add:products") && (
             <Button onClick={() => setShowAdd(true)} data-testid="add-product-btn"
                     className="bg-[#E65100] hover:bg-[#CC4800] text-white rounded-sm h-10 px-4 font-bold">
               <Plus className="w-4 h-4 mr-1.5" /> {t("products.newProduct")}
@@ -386,7 +386,7 @@ export default function Products() {
                  {isOpen && (
                    <div className="bg-slate-50/60 border-t border-slate-100 px-4 sm:px-6 py-4"
                         data-testid={`sku-list-${p.name}`}>
-                     {isAdmin && (
+                     {canAct("add:products") && (
                        <div className="flex justify-end mb-3">
                          <Button size="sm" variant="outline" onClick={() => openAddSku(p)}
                                  data-testid={`add-sku-${p.name}`}

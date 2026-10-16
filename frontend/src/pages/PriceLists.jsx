@@ -24,7 +24,10 @@ import { useConfirm } from "@/lib/useConfirm";
  *  - Excel template upload (Item Name | Price) and download.
  */
 export default function PriceLists() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, can, canAct } = useAuth();
+  const canAdd = canAct("add:priceLists");
+  const canEdit = canAct("edit:priceLists");
+  const canDelete = canAct("delete:priceLists");
   const [lists, setLists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
@@ -328,7 +331,7 @@ export default function PriceLists() {
     }
   };
 
-  if (!isAdmin) return <div className="p-6 text-slate-500">Admin only.</div>;
+  if (!isAdmin && !can("priceLists")) return <div className="p-6 text-slate-500">Admin only.</div>;
 
   // -------------------- List view --------------------
   if (!active) {
@@ -342,13 +345,13 @@ export default function PriceLists() {
               Maintain multiple customer price lists. Assign one to each party from the Customers page.
             </p>
           </div>
-          <Button
+          {canAdd && <Button
             onClick={() => setShowAdd(true)}
             data-testid="add-price-list-btn"
             className="bg-[#E65100] hover:bg-[#CC4800] text-white rounded-sm h-10 px-4 font-bold"
           >
             <Plus className="w-4 h-4 mr-1.5" /> New price list
-          </Button>
+          </Button>}
         </div>
 
         <div className="bg-white border border-slate-200 rounded-sm">
@@ -408,7 +411,7 @@ export default function PriceLists() {
                       </span>
                     </div>
                   </button>
-                  {isAdmin && (
+                  {canEdit && (
                     <div
                       className="flex flex-col items-center gap-0.5 pr-2 border-r border-slate-200"
                       onClick={(e) => e.stopPropagation()}
@@ -433,7 +436,7 @@ export default function PriceLists() {
                   >
                     <Edit3 className="w-3.5 h-3.5 mr-1" /> Manage
                   </Button>
-                  <Button
+                  {canEdit && <Button
                     size="sm"
                     variant="outline"
                     onClick={() => openEditDialog(pl)}
@@ -442,8 +445,8 @@ export default function PriceLists() {
                     title="Rename this price list"
                   >
                     <Edit3 className="w-3.5 h-3.5 mr-1" /> Edit name
-                  </Button>
-                  <Button
+                  </Button>}
+                  {canAdd && <Button
                     size="sm"
                     variant="outline"
                     onClick={() => openCloneDialog(pl)}
@@ -451,8 +454,8 @@ export default function PriceLists() {
                     className="rounded-sm border-slate-300 text-slate-700 hover:bg-orange-50 hover:text-[#E65100] hover:border-orange-200"
                   >
                     <Copy className="w-3.5 h-3.5 mr-1" /> Clone
-                  </Button>
-                  <Button
+                  </Button>}
+                  {canDelete && <Button
                     size="sm"
                     variant="outline"
                     onClick={() => deleteList(pl)}
@@ -460,7 +463,7 @@ export default function PriceLists() {
                     className="rounded-sm border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
+                  </Button>}
                 </div>
               ))}
             </div>
@@ -683,14 +686,14 @@ export default function PriceLists() {
             }}
             data-testid="price-list-upload-input"
           />
-          <Button
+          {canAdd && <Button
             variant="outline"
             onClick={() => fileInputRef.current?.click()}
             data-testid="upload-price-xlsx"
             className="rounded-sm border-slate-300 h-9"
           >
             <Upload className="w-4 h-4 mr-1.5" /> Upload Excel
-          </Button>
+          </Button>}
           <Button
             variant="outline"
             onClick={downloadXlsx}
@@ -702,7 +705,7 @@ export default function PriceLists() {
           {/* Task 3 — De-link from all customers in one click. Always
               visible to admins so the affordance is discoverable; disabled
               when no customer is linked. */}
-          {isAdmin && (
+          {canEdit && (
             <Button
               variant="outline"
               onClick={() => delinkList(active, detail.customers_count || 0)}

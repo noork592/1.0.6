@@ -17,7 +17,9 @@ import {
 const fmt = (n) => `₹${Number(n || 0).toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
 export default function VendorPriceLists() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, can, canAct } = useAuth();
+  const canAdd = canAct("add:vendorPriceLists");
+  const canDelete = canAct("delete:vendorPriceLists");
   const [lists, setLists] = useState([]);
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -215,7 +217,7 @@ export default function VendorPriceLists() {
     } finally { setImporting(false); }
   };
 
-  if (!isAdmin) return <div className="p-6 text-slate-500">Admin only.</div>;
+  if (!isAdmin && !can("vendorPriceLists")) return <div className="p-6 text-slate-500">Admin only.</div>;
 
   // -------------------- List view --------------------
   if (!active) {
@@ -229,13 +231,13 @@ export default function VendorPriceLists() {
               One price list per vendor. Each list holds the vendor&apos;s own items + prices.
             </p>
           </div>
-          <Button
+          {canAdd && <Button
             onClick={openCreateDialog}
             data-testid="add-vendor-price-list-btn"
             className="bg-[#E65100] hover:bg-[#CC4800] text-white rounded-sm h-10 px-4 font-bold"
           >
             <Plus className="w-4 h-4 mr-1.5" /> New vendor price list
-          </Button>
+          </Button>}
         </div>
 
         <div className="bg-white border border-slate-200 rounded-sm">
@@ -286,7 +288,7 @@ export default function VendorPriceLists() {
                   >
                     <Edit3 className="w-3.5 h-3.5 mr-1" /> Manage
                   </Button>
-                  <Button
+                  {canDelete && <Button
                     size="sm"
                     variant="outline"
                     onClick={() => setConfirmDel({ kind: "list", target: pl })}
@@ -294,7 +296,7 @@ export default function VendorPriceLists() {
                     className="rounded-sm border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
+                  </Button>}
                 </div>
               ))}
             </div>
