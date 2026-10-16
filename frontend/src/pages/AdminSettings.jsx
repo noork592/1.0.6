@@ -5,14 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Save, AlertTriangle, Clock, Lock, Info } from "lucide-react";
+import { Save, AlertTriangle, Clock, Lock } from "lucide-react";
 import PwaHealth from "@/components/PwaHealth";
 import BackupRestore from "@/components/BackupRestore";
 import ResyncOrders from "@/components/ResyncOrders";
 
 // Software release version — surfaced in Admin Settings so operators can
 // quickly confirm which build they are running when reporting issues.
-import { APP_VERSION } from "@/constants/version";
 
 export default function AdminSettings() {
   const { t } = useTranslation();
@@ -262,25 +261,6 @@ export default function AdminSettings() {
 
       {/* Backup & Restore */}
       <BackupRestore />
-
-      {/* Software version card — quick reference for support / release tracking */}
-      <div className="bg-white border border-slate-200 rounded-sm max-w-2xl">
-        <div className="p-5 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-sm bg-slate-50 border border-slate-200 grid place-items-center text-slate-600">
-            <Info className="w-5 h-5" />
-          </div>
-          <div className="flex-1">
-            <div className="font-bold text-slate-900">Software version</div>
-            <div className="text-xs text-slate-500">Current build running on this device.</div>
-          </div>
-          <div
-            data-testid="app-version-badge"
-            className="font-mono-num text-base font-extrabold text-[#E65100] bg-orange-50 border border-orange-200 rounded-sm px-3 py-1.5"
-          >
-            v{APP_VERSION}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
