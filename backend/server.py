@@ -2940,7 +2940,7 @@ async def dispatch_match(body: DispatchStockIn, user=Depends(get_current_user)):
 
 
 @api_router.post("/dispatch/execute")
-async def dispatch_execute(body: DispatchExecuteIn, user=Depends(require_action("add:dispatch"))):
+async def dispatch_execute(body: DispatchExecuteIn, user=Depends(require_action("add:customerLedger"))):
     """Partially fulfill a pending order. Subtracts the given quantities from
     each item line. Items hitting 0 are removed. If the order has no items
     left, it is marked Dispatched; otherwise it stays Pending so the
@@ -6083,7 +6083,7 @@ async def reconcile_orders(dry_run: bool = True, body: Optional[ReconcileIn] = N
 
 
 @api_router.post("/dispatch/off-order")
-async def dispatch_off_order(body: OffOrderDispatchIn, user=Depends(require_action("add:dispatch"))):
+async def dispatch_off_order(body: OffOrderDispatchIn, user=Depends(require_action("add:customerLedger"))):
     """Dispatch SKUs to a party — used either for walk-ins (no parent
     order) OR for an existing customer where the operator wants to short-
     circuit the regular allocation flow. Now available to BOTH admins and

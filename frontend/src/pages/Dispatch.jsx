@@ -12,9 +12,12 @@ import {
 } from "lucide-react";
 import ItemSearchInput from "@/components/ItemSearchInput";
 import DatePicker from "@/components/DatePicker";
+import { useAuth } from "@/lib/auth";
 
 export default function Dispatch() {
   const { t } = useTranslation();
+  const { canAct } = useAuth();
+  const canDispatch = canAct("add:customerLedger");
   return (
     <div className="space-y-5" data-testid="dispatch-page">
       <div>
@@ -24,6 +27,13 @@ export default function Dispatch() {
           {t("dispatch.subtitle")}
         </p>
       </div>
+
+      {!canDispatch && (
+        <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-900 text-sm font-bold px-4 py-3 rounded-sm" data-testid="dispatch-no-permission">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          You don't have permission to dispatch. Ask an admin to tick "Add customer ledger".
+        </div>
+      )}
 
       <Tabs defaultValue="stock-match" className="w-full">
         <TabsList className="bg-slate-100 h-10 p-1 rounded-sm w-full sm:w-auto">
@@ -38,6 +48,7 @@ export default function Dispatch() {
           </TabsTrigger>
         </TabsList>
 
+        <fieldset disabled={!canDispatch} className={!canDispatch ? "opacity-60" : ""} data-testid="dispatch-fieldset">
         <TabsContent value="stock-match" className="mt-4">
           <StockMatchDispatch />
         </TabsContent>
@@ -49,6 +60,7 @@ export default function Dispatch() {
         <TabsContent value="off-order" className="mt-4">
           <OffOrderDispatch />
         </TabsContent>
+        </fieldset>
       </Tabs>
     </div>
   );
