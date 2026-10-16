@@ -5,6 +5,7 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import io
+import contextvars
 import re
 import json
 import base64
@@ -24,7 +25,27 @@ load_dotenv(ROOT_DIR / '.env')
 
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+_main_db = client[os.environ['DB_NAME']]
+# Blank-view (demo) accounts like JK1 read/write an isolated, empty database.
+_blank_db = client[os.environ['DB_NAME'] + "_blank"]
+_use_blank_db = contextvars.ContextVar("use_blank_db", default=False)
+_SHARED_COLLECTIONS = {"users", "admin_otp_challenges", "login_attestations"}
+
+
+class _DBRouter:
+    def _pick(self, name):
+        return _blank_db if (_use_blank_db.get() and name not in _SHARED_COLLECTIONS) else _main_db
+
+    def __getattr__(self, name):
+        if name.startswith("_"):
+            raise AttributeError(name)
+        return getattr(self._pick(name), name)
+
+    def __getitem__(self, name):
+        return self._pick(name)[name]
+
+
+db = _DBRouter()
 
 JWT_SECRET = os.environ['JWT_SECRET']
 JWT_ALG = os.environ.get('JWT_ALG', 'HS256')
@@ -579,6 +600,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         user = await db.users.find_one({"id": payload["sub"]}, {"_id": 0, "password": 0})
         if not user:
             raise HTTPException(status_code=401, detail="User not found")
+        _use_blank_db.set(bool(user.get("blank_view")))
         return user
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
@@ -628,7 +650,7 @@ DEMO_USERNAMES = {"JK1"}
 
 def require_users_admin(user: Dict[str, Any] = Depends(require_admin)) -> Dict[str, Any]:
     uname = str(user.get("username") or "").strip().upper()
-    if uname in {u.upper() for u in DEMO_USERNAMES}:
+    if uname in {u.upper() for u in DEMO_USERNAMES} or user.get("blank_view"):
         raise HTTPException(status_code=403, detail="Not permitted for this account")
     return user
 
@@ -1320,24 +1342,24 @@ class BackupSettingsUpdate(BaseModel):
 
 
 @api_router.get("/admin/backup/settings")
-async def get_backup_settings(admin=Depends(require_admin)):
+async def get_backup_settings(admin=Depends(require_users_admin)):
     doc = await backup_mod.get_settings(db)
     return backup_mod._mask(doc)
 
 
 @api_router.patch("/admin/backup/settings")
-async def patch_backup_settings(body: BackupSettingsUpdate, admin=Depends(require_admin)):
+async def patch_backup_settings(body: BackupSettingsUpdate, admin=Depends(require_users_admin)):
     return await backup_mod.update_settings(db, body.dict(exclude_unset=True))
 
 
 @api_router.post("/admin/backup/run")
-async def run_backup_now(admin=Depends(require_admin)):
+async def run_backup_now(admin=Depends(require_users_admin)):
     """Trigger an immediate backup-and-email run."""
     return await backup_mod.run_backup_now(db)
 
 
 @api_router.post("/admin/backup/restore")
-async def restore_backup(file: UploadFile = File(...), admin=Depends(require_admin)):
+async def restore_backup(file: UploadFile = File(...), admin=Depends(require_users_admin)):
     """Replace the entire database with the contents of the uploaded ZIP.
     Protected collections (e.g. backup settings themselves) are kept intact.
     """
@@ -5591,6 +5613,8 @@ async def list_login_attestations(
     admin=Depends(require_admin),
 ):
     """Admin-only audit log of all login captures (most recent first)."""
+    if is_blank_view(admin):
+        return {"total": 0, "items": []}
     q: Dict[str, Any] = {}
     if user_id:
         q["user_id"] = user_id
