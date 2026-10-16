@@ -172,7 +172,7 @@ export default function Layout() {
           <div className="md:hidden">
             <BrandMark size={28} variant="brand" />
           </div>
-          <div className="font-heading font-bold text-slate-900 truncate" data-testid="topbar-app-name">JK</div>
+          <div className="font-heading text-xl sm:text-2xl font-extrabold tracking-[0.08em] text-[#E65100] leading-none" data-testid="topbar-app-name">JK</div>
           <div className="ml-auto flex items-center gap-2">
             <NotificationCenter />
             <LanguageSwitcher />
