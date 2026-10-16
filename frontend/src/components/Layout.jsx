@@ -172,7 +172,10 @@ export default function Layout() {
           <div className="md:hidden">
             <BrandMark size={28} variant="brand" />
           </div>
-          <div className="font-heading font-bold text-slate-900 truncate">{t("nav.appName")}</div>
+          <div className="font-heading font-bold text-slate-900 truncate">
+            <span className="md:hidden" data-testid="topbar-app-name-mobile">JK</span>
+            <span className="hidden md:inline">{t("nav.appName")}</span>
+          </div>
           <div className="ml-auto flex items-center gap-2">
             <NotificationCenter />
             <LanguageSwitcher />
