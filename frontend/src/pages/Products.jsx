@@ -343,16 +343,16 @@ export default function Products() {
                      }
                    }}
                    data-testid={`expand-product-${p.name}`}
-                   className="w-full p-4 sm:p-5 flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors text-left cursor-pointer">
-                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                     <div className="w-6 h-6 grid place-items-center text-slate-400 shrink-0">
+                   className="w-full p-3 sm:p-5 flex items-center justify-between gap-2 sm:gap-3 hover:bg-slate-50 transition-colors text-left cursor-pointer">
+                   <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                     <div className="w-5 sm:w-6 h-6 grid place-items-center text-slate-400 shrink-0">
                        {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                      </div>
-                     <div className="w-10 h-10 bg-orange-50 border border-orange-200 rounded-sm grid place-items-center shrink-0">
-                       <PackageOpen className="w-5 h-5 text-[#E65100]" />
+                     <div className="w-8 h-8 sm:w-10 sm:h-10 bg-orange-50 border border-orange-200 rounded-sm grid place-items-center shrink-0">
+                       <PackageOpen className="w-4 h-4 sm:w-5 sm:h-5 text-[#E65100]" />
                      </div>
                      <div className="min-w-0">
-                       <div className="font-bold text-slate-900 truncate">{p.name}</div>
+                       <div className="font-bold text-slate-900 break-words leading-snug">{p.name}</div>
                        <div className="text-xs text-slate-500 font-mono-num">
                          {`${p.max_per_bag} ${t("products.pcsPerBag")}`}
                          <> · {t("products.skuCount", { count: skuList.length })}</>
@@ -364,12 +364,12 @@ export default function Products() {
                      </div>
                    </div>
                    {(canEditProducts || canDeleteProducts) && (
-                     <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+                     <div className="flex items-center gap-1.5 sm:gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                        {canEditProducts && (
                        <Button size="sm" variant="outline" onClick={() => openEdit(p)}
                                data-testid={`edit-product-${p.name}`}
-                               className="rounded-sm border-slate-300">
-                         <Edit3 className="w-3.5 h-3.5 mr-1" /> {t("common.edit")}
+                               className="rounded-sm border-slate-300 px-2.5 sm:px-3">
+                         <Edit3 className="w-3.5 h-3.5 sm:mr-1" /> <span className="hidden sm:inline">{t("common.edit")}</span>
                        </Button>
                        )}
                        {canDeleteProducts && (
