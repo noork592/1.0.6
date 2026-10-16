@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Plus, Trash2, Pencil, X, Search, Building2, ScrollText } from "lucide-react";
+import { Plus, Trash2, Pencil, X, Search, Building2, ScrollText, Phone } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +20,10 @@ export default function Suppliers() {
   // `/admin/suppliers` → Vendor Ledger view (shows Ledger button + ledger-y copy)
   // `/admin/vendors`   → plain Vendors master view (Add / Edit / Delete only)
   const isLedgerView = location.pathname.startsWith("/admin/suppliers");
+  const { canAct } = useAuth();
+  const canAdd = canAct("add:suppliers");
+  const canEdit = canAct("edit:suppliers");
+  const canDelete = canAct("delete:suppliers");
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [q, setQ] = useState("");
@@ -106,11 +111,11 @@ export default function Suppliers() {
             }
           </p>
         </div>
-        <Button onClick={openCreate}
+        {canAdd && <Button onClick={openCreate}
                 data-testid="suppliers-add-btn"
                 className="bg-[#E65100] hover:bg-[#CC4800] text-white rounded-sm h-10">
           <Plus className="w-4 h-4 mr-1" /> Add vendor
-        </Button>
+        </Button>}
       </div>
 
       <div className="relative max-w-md">
@@ -121,7 +126,60 @@ export default function Suppliers() {
                className="pl-9 h-10 rounded-sm" />
       </div>
 
-      <div className="border border-slate-200 rounded-sm overflow-hidden bg-white">
+      <div className="md:hidden space-y-2" data-testid="suppliers-mobile-list">
+        {loading && <div className="p-6 text-center text-slate-500 bg-white border border-slate-200 rounded-sm">Loading…</div>}
+        {!loading && filtered.length === 0 && (
+          <div className="p-6 text-center text-slate-500 bg-white border border-slate-200 rounded-sm text-sm">
+            {rows.length === 0 ? "No vendors yet. Click Add vendor to begin." : "No vendors match your search."}
+          </div>
+        )}
+        {!loading && filtered.map((s) => (
+          <div key={s.id} className="bg-white border border-slate-200 rounded-sm p-3" data-testid={`supplier-card-${s.id}`}>
+            <div className="flex items-start gap-2">
+              <Building2 className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <div className="font-bold text-slate-900 break-words leading-snug">{s.name}</div>
+                {s.contact_person && <div className="text-[11px] text-slate-500">{s.contact_person}</div>}
+              </div>
+              <div className="text-right shrink-0">
+                <div className="text-[9px] uppercase tracking-wider font-bold text-slate-500">Opening</div>
+                <div className="tabular-nums text-sm font-bold text-slate-900">₹{Number(s.opening_balance || 0).toLocaleString("en-IN")}</div>
+              </div>
+            </div>
+            {s.material_category && (
+              <div className="flex flex-wrap gap-1 mt-2 pl-6">
+                {s.material_category.split(",").map((m) => m.trim()).filter(Boolean).map((m) => (
+                  <span key={m} className="text-[10px] uppercase tracking-wider font-bold bg-orange-50 border border-orange-200 text-orange-900 px-2 py-0.5 rounded-sm">{m}</span>
+                ))}
+              </div>
+            )}
+            <div className="flex items-center gap-2 mt-2 pl-6">
+              <span className="text-xs text-slate-600 font-mono-num inline-flex items-center gap-1 mr-auto">
+                <Phone className="w-3 h-3 text-slate-400" /> {s.phone || "—"}
+              </span>
+              {isLedgerView && (
+                <Link to={`/admin/suppliers/${s.id}`}>
+                  <Button size="sm" variant="outline" className="rounded-sm h-8" data-testid={`supplier-card-ledger-${s.id}`}>
+                    <ScrollText className="w-3.5 h-3.5 mr-1" /> Ledger
+                  </Button>
+                </Link>
+              )}
+              {canEdit && (
+                <Button size="sm" variant="outline" className="rounded-sm h-8" onClick={() => openEdit(s)} data-testid={`supplier-card-edit-${s.id}`}>
+                  <Pencil className="w-3.5 h-3.5" />
+                </Button>
+              )}
+              {canDelete && (
+                <Button size="sm" variant="outline" className="rounded-sm h-8 text-red-700 hover:bg-red-50" onClick={() => setConfirm(s)} data-testid={`supplier-card-delete-${s.id}`}>
+                  <Trash2 className="w-3.5 h-3.5" />
+                </Button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden md:block border border-slate-200 rounded-sm overflow-hidden bg-white">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-wider text-slate-600 font-bold">
             <tr>
@@ -144,7 +202,7 @@ export default function Suppliers() {
             {!loading && filtered.map((s) => (
               <tr key={s.id} className="border-t border-slate-100 hover:bg-orange-50/30" data-testid={`supplier-row-${s.id}`}>
                 <td className="px-4 py-2 font-bold text-slate-900 flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-slate-400" />
+                  <Building2 className="w-4 h-4 text-slate-400 shrink-0" />
                   {s.name}
                   {s.contact_person && <span className="text-[11px] text-slate-500 font-normal">· {s.contact_person}</span>}
                 </td>
@@ -159,12 +217,12 @@ export default function Suppliers() {
                       </Button>
                     </Link>
                   )}
-                  <Button size="sm" variant="outline" className="rounded-sm h-8" onClick={() => openEdit(s)} data-testid={`supplier-edit-${s.id}`}>
+                  {canEdit && <Button size="sm" variant="outline" className="rounded-sm h-8" onClick={() => openEdit(s)} data-testid={`supplier-edit-${s.id}`}>
                     <Pencil className="w-3.5 h-3.5" />
-                  </Button>
-                  <Button size="sm" variant="outline" className="rounded-sm h-8 text-red-700 hover:bg-red-50" onClick={() => setConfirm(s)} data-testid={`supplier-delete-${s.id}`}>
+                  </Button>}
+                  {canDelete && <Button size="sm" variant="outline" className="rounded-sm h-8 text-red-700 hover:bg-red-50" onClick={() => setConfirm(s)} data-testid={`supplier-delete-${s.id}`}>
                     <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
+                  </Button>}
                 </td>
               </tr>
             ))}
