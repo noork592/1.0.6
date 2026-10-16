@@ -62,12 +62,12 @@ export default function LoginAttestations() {
           <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900">{t("loginAudit.title")}</h1>
           <p className="text-slate-500 text-sm mt-1">{t("loginAudit.subtitle")}</p>
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center w-full sm:w-auto">
           <select
             value={filterConsent}
             onChange={(e) => { setFilterConsent(e.target.value); setSkip(0); }}
             data-testid="filter-consent"
-            className="h-10 rounded-sm border border-slate-300 px-3 text-sm bg-white"
+            className="h-10 rounded-sm border border-slate-300 px-3 text-sm bg-white flex-1 sm:flex-none min-w-0"
           >
             <option value="all">{t("loginAudit.filterAll")}</option>
             <option value="yes">{t("loginAudit.filterConsented")}</option>
@@ -79,7 +79,49 @@ export default function LoginAttestations() {
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-sm overflow-hidden">
+      <div className="md:hidden space-y-2" data-testid="attestations-mobile-list">
+        {loading && <div className="p-6 text-center text-slate-400 bg-white border border-slate-200 rounded-sm">{t("loginAudit.loading")}</div>}
+        {!loading && items.length === 0 && <div className="p-6 text-center text-slate-400 bg-white border border-slate-200 rounded-sm">{t("loginAudit.empty")}</div>}
+        {!loading && items.map((r) => (
+          <button
+            type="button"
+            key={r.id}
+            onClick={() => setActive(r)}
+            className="w-full text-left bg-white border border-slate-200 rounded-sm p-3 active:bg-slate-50"
+            data-testid={`attestation-card-${r.id}`}
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="font-bold text-slate-900 truncate">{r.user_name || r.username}</div>
+                <div className="text-[11px] text-slate-500 truncate">{r.user_email}</div>
+              </div>
+              <div className="font-mono-num text-[11px] text-slate-600 whitespace-nowrap shrink-0">{fmtDate(r.created_at)}</div>
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
+              <span className="font-mono-num text-slate-500">{r.ip || "—"}</span>
+              {r.latitude != null && r.longitude != null ? (
+                <a href={mapsLink(r.latitude, r.longitude)} target="_blank" rel="noreferrer"
+                   onClick={(e) => e.stopPropagation()}
+                   className="text-[#E65100] inline-flex items-center gap-1 font-mono-num">
+                  <MapPin className="w-3 h-3" /> {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}
+                </a>
+              ) : (
+                <span className="text-slate-400">{t("loginAudit.locUnavailable")}</span>
+              )}
+              {r.consent ? (
+                <span className="inline-flex items-center gap-1 font-bold text-emerald-700"><CheckCircle2 className="w-3 h-3" /> {t("loginAudit.colConsent")}</span>
+              ) : (
+                <span className="inline-flex items-center gap-1 font-bold text-amber-700"><AlertTriangle className="w-3 h-3" /> {t("loginAudit.no")}</span>
+              )}
+              {r.has_photo && (
+                <span className="inline-flex items-center gap-1 font-bold text-slate-700"><Camera className="w-3 h-3" /> {t("loginAudit.colPhoto")}</span>
+              )}
+            </div>
+          </button>
+        ))}
+      </div>
+
+      <div className="hidden md:block bg-white border border-slate-200 rounded-sm overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-wider text-slate-500">
             <tr>
