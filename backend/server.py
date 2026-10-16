@@ -906,7 +906,9 @@ async def me(user=Depends(get_current_user)):
 
 # ======================== Admin: User Management ========================
 @api_router.get("/users")
-async def list_users(admin=Depends(require_users_admin)):
+async def list_users(admin=Depends(require_admin)):
+    if admin.get("blank_view"):
+        return [admin]
     users = await db.users.find({}, {"_id": 0, "password": 0}).sort("created_at", 1).to_list(500)
     return users
 
@@ -1342,13 +1344,13 @@ class BackupSettingsUpdate(BaseModel):
 
 
 @api_router.get("/admin/backup/settings")
-async def get_backup_settings(admin=Depends(require_users_admin)):
+async def get_backup_settings(admin=Depends(require_admin)):
     doc = await backup_mod.get_settings(db)
     return backup_mod._mask(doc)
 
 
 @api_router.patch("/admin/backup/settings")
-async def patch_backup_settings(body: BackupSettingsUpdate, admin=Depends(require_users_admin)):
+async def patch_backup_settings(body: BackupSettingsUpdate, admin=Depends(require_admin)):
     return await backup_mod.update_settings(db, body.dict(exclude_unset=True))
 
 
