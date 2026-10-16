@@ -850,6 +850,7 @@ function PriceRow({ row, onSave, saving, readOnly }) {
             size="sm"
             onClick={() => onSave(val)}
             disabled={saving}
+            data-testid={`price-save-${row.item_id}`}
             className="bg-[#E65100] hover:bg-[#CC4800] text-white rounded-sm h-9 px-3"
           >
             <Save className="w-3.5 h-3.5" />
@@ -897,7 +898,7 @@ function DiscountRow({ category, value, type, onSave, readOnly }) {
             disabled={readOnly}
             onClick={() => setTp(tp === "₹" ? "" : "₹")}
             data-testid={`discount-type-rs-${category}`}
-            className={`h-9 px-2 rounded-l-sm border text-xs font-bold ${tp === "₹" ? "bg-[#E65100] text-white border-[#E65100]" : `bg-white text-slate-700 ${needsType ? "border-rose-400" : "border-slate-300"}`}`}
+            className={`h-9 px-2 rounded-l-sm border text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed ${tp === "₹" ? "bg-[#E65100] text-white border-[#E65100]" : `bg-white text-slate-700 ${needsType ? "border-rose-400" : "border-slate-300"}`}`}
           >
             <IndianRupee className="w-3 h-3 inline -mt-0.5" />
           </button>
@@ -906,7 +907,7 @@ function DiscountRow({ category, value, type, onSave, readOnly }) {
             disabled={readOnly}
             onClick={() => setTp(tp === "%" ? "" : "%")}
             data-testid={`discount-type-pct-${category}`}
-            className={`h-9 px-2 rounded-r-sm border -ml-px text-xs font-bold ${tp === "%" ? "bg-[#E65100] text-white border-[#E65100]" : `bg-white text-slate-700 ${needsType ? "border-rose-400" : "border-slate-300"}`}`}
+            className={`h-9 px-2 rounded-r-sm border -ml-px text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed ${tp === "%" ? "bg-[#E65100] text-white border-[#E65100]" : `bg-white text-slate-700 ${needsType ? "border-rose-400" : "border-slate-300"}`}`}
           >
             <Percent className="w-3 h-3 inline -mt-0.5" />
           </button>

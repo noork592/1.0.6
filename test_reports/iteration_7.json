@@ -1,0 +1,29 @@
+{
+  "summary": "Verified all 4 iteration_6 gaps are fixed + quick regression. Backend: 10/10 pytest pass (new test_iter7_gating_clone.py: clone copies bill_amount_required for both False and True; item price save 403 without edit:priceLists, 200 + persisted with it; qaprice final perms verified; plus iteration_6 suite rerun). Frontend: qaprice (add:vendorPriceLists only) vendor list detail shows 0/56 per-item delete buttons, name/unit/price inputs disabled, Add item + Upload Excel visible; after granting edit:+delete:vendorPriceLists, 56 delete buttons, inputs enabled, save button appears on dirty (no real data saved), list-level delete shown. Customer price list detail without edit:priceLists: price-input disabled, all 15 discount-value inputs disabled, 0 discount-save buttons, De-link hidden; with edit: inputs enabled, 15 discount-save, item price 88 saved via UI and persisted. topbar-new-order and dashboard-new-order hidden for qaprice, visible for qaadmin. Regression: qaprice sees Customer Price Lists page (no 'Admin only'), New/Edit/Clone/Delete buttons visible; qaadmin sees all; dashboard loads with no page errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Customer price list detail (read-only)", "issues": ["Disabled discount type buttons (₹ / %) have no disabled styling (no opacity/cursor change), so they look clickable to read-only users"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter7_gating_clone.py",
+    "/app/backend/tests/test_action_permissions_pricelists.py",
+    "/app/test_reports/pytest/pytest_iter7.xml"
+  ],
+  "action_items": ["Optional: add disabled:opacity-50 disabled:cursor-not-allowed to discount-type-rs-*/discount-type-pct-* buttons"],
+  "critical_code_review_comments": [
+    "PriceRow save button had no data-testid - tester added data-testid=price-save-{item_id}",
+    "backend/pytest.ini uses xdist (-n auto); tests that mutate qaprice perms race each other when run in parallel - run perm tests with -n 0",
+    "server.py still ~9.9k lines - should be split into routers"
+  ],
+  "updated_files": ["/app/backend/tests/test_iter7_gating_clone.py", "/app/frontend/src/pages/PriceLists.jsx (added data-testid only)"],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "qaadmin / QaAdmin@123, qaprice / QaPrice@123 (from /app/memory/test_credentials.md)",
+  "seed_data_creation": "TEST_QA7_* price lists created and deleted; no TEST_ lists remain. qaprice perms restored to: dashboard, priceLists, vendorPriceLists, products, customers, add/edit/delete:priceLists, add:vendorPriceLists, add:products, add:customers (verified).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Real production data in DB - only touch TEST_QA* records and qa users. After PATCHing perms, re-login (clear localStorage) to pick up new perms in UI. Run perm-mutating pytest with -n 0. Vendor item inputs testids: vendor-item-name-/unit-/price-{id} (exclude *-input which are the add-form fields)."
+}
