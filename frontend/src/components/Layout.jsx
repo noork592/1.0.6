@@ -163,25 +163,23 @@ export default function Layout() {
             controls inside stay below the dynamic island / notch, and the
             white bg fills the status-bar strip on iPhone PWA. */}
         <header
-          className="sticky top-0 z-30 bg-white border-b border-slate-200 flex items-center gap-3 pt-[env(safe-area-inset-top)] pl-[calc(1rem+env(safe-area-inset-left))] pr-[calc(1rem+env(safe-area-inset-right))] sm:pl-[calc(1.5rem+env(safe-area-inset-left))] sm:pr-[calc(1.5rem+env(safe-area-inset-right))]"
+          className="sticky top-0 z-30 bg-white border-b border-slate-200 flex items-center gap-2 sm:gap-3 pt-[env(safe-area-inset-top)] pl-[calc(1rem+env(safe-area-inset-left))] pr-[calc(1rem+env(safe-area-inset-right))] sm:pl-[calc(1.5rem+env(safe-area-inset-left))] sm:pr-[calc(1.5rem+env(safe-area-inset-right))]"
           style={{ minHeight: "calc(3.5rem + env(safe-area-inset-top))" }}
         >
           <button data-testid="mobile-menu-btn" className="md:hidden p-2 -ml-2" onClick={() => setOpen(!open)}>
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
-          <div className="md:hidden">
-            <BrandMark size={28} variant="brand" />
+          <div className="md:hidden flex items-center gap-1.5 shrink-0">
+            <BrandMark size={26} variant="brand" />
+            <span className="font-heading font-bold text-slate-900 text-base leading-none" data-testid="topbar-app-name-mobile">JK</span>
           </div>
-          <div className="font-heading font-bold text-slate-900 truncate">
-            <span className="md:hidden" data-testid="topbar-app-name-mobile">JK</span>
-            <span className="hidden md:inline">{t("nav.appName")}</span>
-          </div>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="hidden md:block font-heading font-bold text-slate-900 truncate min-w-0">{t("nav.appName")}</div>
+          <div className="ml-auto flex items-center gap-1.5 sm:gap-2 shrink-0">
             <NotificationCenter />
             <LanguageSwitcher />
             {(can("newOrder") || can("orders")) && <Button onClick={() => nav("/orders/new")} data-testid="topbar-new-order"
-                    className="bg-[#E65100] hover:bg-[#CC4800] text-white rounded-sm h-10 px-4 font-bold active:scale-[0.98]">
-              <Plus className="w-4 h-4 mr-1.5" /> <span className="hidden sm:inline">{t("nav.newOrder")}</span><span className="sm:hidden">{t("nav.new")}</span>
+                    className="bg-[#E65100] hover:bg-[#CC4800] text-white rounded-sm h-10 px-3 sm:px-4 font-bold active:scale-[0.98]">
+              <Plus className="w-4 h-4 max-[359px]:mr-0 mr-1 sm:mr-1.5" /> <span className="hidden sm:inline">{t("nav.newOrder")}</span><span className="sm:hidden max-[359px]:hidden">{t("nav.new")}</span>
             </Button>}
           </div>
         </header>
